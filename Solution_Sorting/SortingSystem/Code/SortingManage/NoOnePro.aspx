@@ -109,6 +109,18 @@
                     <td style="width: 115px">
                         <asp:LinkButton ID="lnkBtnGetBatchNo" runat="server" OnClick="lnkBtnGetBatchNo_Click"></asp:LinkButton></td>
                 </tr>
+                                <tr>
+                    <td class="tdTitle" style="width: 166px; height:31px">卷烟类型</td>
+                    <td style="width: 40px">
+                        <asp:DropDownList ID="ddlCigaretteType" runat="server">
+                            <asp:ListItem Value="0">正常烟</asp:ListItem>
+                            <asp:ListItem Value="1">异型烟</asp:ListItem>
+                        </asp:DropDownList>
+                        </td>
+                    <td style="width: 115px">
+
+                    </td>
+                </tr>
                 <tr>
                     <td colspan="3" style="height: 60px">
                         上传一号工程<br />

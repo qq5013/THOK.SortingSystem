@@ -16,7 +16,7 @@ public partial class Code_SortingManage_NoOnePro : BasePage
 {
     private static Dictionary<string, string> parameter = null;
     private static Thread thread = null;
-    private static UploadData uploadData = new UploadData();
+    private static UploadData uploadData = null;
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -53,6 +53,15 @@ public partial class Code_SortingManage_NoOnePro : BasePage
 
     protected void btnStart_Click(object sender, EventArgs e)
     {
+        if (this.ddlCigaretteType.SelectedValue == "1")
+        {
+            uploadData = new UploadData(true);
+        }
+        else
+        {
+            uploadData = new UploadData();
+        }
+        
         if (txtOrderDate.Text.Trim().Length != 0)
         {
             if (ddlBatchNo.Items.Count != 0)

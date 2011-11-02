@@ -56,7 +56,7 @@ namespace THOK.AS.Dao
                                 "BEGIN " +
                                     "IF '{1}' =  '1' " +
                                     "BEGIN " +
-                                        "UPDATE AS_BI_CIGARETTE SET ISABNORMITY = '{1}' WHERE CIGARETTECODE = '{0}' " +
+                                        "UPDATE AS_BI_CIGARETTE SET ISABNORMITY = '{1}',CIGARETTENAME = '{2}' WHERE CIGARETTECODE = '{0}' " +
                                     "END " +
                                 "END " +
                              "ELSE " +

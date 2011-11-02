@@ -16,6 +16,7 @@ namespace THOK.AS.Schedule
         private Dictionary<string, string> parameter = null;
         private string txtFile = "";
         private string zipFile = "";
+        private bool isAbnormity = false;
 
         public UploadData()
         {
@@ -29,6 +30,26 @@ namespace THOK.AS.Schedule
                 DirectoryInfo dir = new DirectoryInfo(parameter["NoOneProFilePath"]);
                 if (!dir.Exists)
                     dir.Create();                
+            }
+            catch (Exception e)
+            {
+                ProcessState.Status = "ERROR";
+                ProcessState.Message = e.Message;
+            }
+        }
+
+        public UploadData(bool IsAbnormity)
+        {
+            parameter = new Dal.ParameterDal().FindParameter();
+            txtFile = "RetailerOrder" + System.DateTime.Now.ToString("yyyyMMddHHmmss");
+            zipFile = parameter["NoOneProFilePath"] + txtFile + ".zip";
+            txtFile = txtFile + (IsAbnormity ? ".YXOrder" : ".Order");
+            this.isAbnormity = IsAbnormity;
+            try
+            {
+                DirectoryInfo dir = new DirectoryInfo(parameter["NoOneProFilePath"]);
+                if (!dir.Exists)
+                    dir.Create();
             }
             catch (Exception e)
             {
@@ -78,57 +99,80 @@ namespace THOK.AS.Schedule
             FileStream file = new FileStream(parameter["NoOneProFilePath"] + txtFile, FileMode.Create);
             StreamWriter writer = new StreamWriter(file, Encoding.UTF8);
             OrderScheduleDal orderDal = new OrderScheduleDal();
+            DataTable table;
+            int columnCount;
 
-            //正常分拣打码
-            DataTable table = orderDal.GetOrder(orderDate, batchNo, 1);
-            int columnCount = table.Columns.Count;
-            foreach (DataRow row in table.Rows)
+            if (!this.isAbnormity)
             {
-                string s = row["SORTNO"].ToString();
-                for (int i = 1; i < columnCount; i++)
-                    s += ("," + row[i].ToString().Trim());
-                s += ";";
-                writer.WriteLine(s);
-                writer.Flush();
+                //正常分拣打码
+                table = orderDal.GetOrder(orderDate, batchNo, 1);
+                columnCount = table.Columns.Count;
+                foreach (DataRow row in table.Rows)
+                {
+                    string s = row["SORTNO"].ToString();
+                    for (int i = 1; i < columnCount; i++)
+                        s += ("," + row[i].ToString().Trim());
+                    s += ";";
+                    writer.WriteLine(s);
+                    writer.Flush();
+                }
             }
 
-            //手工分拣打码
-            table = orderDal.GetOrder(orderDate, batchNo, 2);
-            columnCount = table.Columns.Count;
-            foreach (DataRow row in table.Rows)
+            if (!this.isAbnormity)
             {
-                string s = row["SORTNO"].ToString();
-                for (int i = 1; i < columnCount; i++)
-                    s += ("," + row[i].ToString().Trim());
-                s += ";";
-                writer.WriteLine(s);
-                writer.Flush();
+                //手工分拣打码
+                table = orderDal.GetOrder(orderDate, batchNo, 2);
+                columnCount = table.Columns.Count;
+                foreach (DataRow row in table.Rows)
+                {
+                    string s = row["SORTNO"].ToString();
+                    for (int i = 1; i < columnCount; i++)
+                        s += ("," + row[i].ToString().Trim());
+                    s += ";";
+                    writer.WriteLine(s);
+                    writer.Flush();
+                }
             }
 
-            //整件分拣打码
-            table = orderDal.GetOrder(orderDate, batchNo, 3);
-            columnCount = table.Columns.Count;
-            foreach (DataRow row in table.Rows)
+            if (!this.isAbnormity)
             {
-                string s = row["SORTNO"].ToString();
-                for (int i = 1; i < columnCount; i++)
-                    s += ("," + row[i].ToString().Trim());
-                s += ";";
-                writer.WriteLine(s);
-                writer.Flush();
+                //整件分拣打码
+                table = orderDal.GetOrder(orderDate, batchNo, 3);
+                columnCount = table.Columns.Count;
+                foreach (DataRow row in table.Rows)
+                {
+                    string s = row["SORTNO"].ToString();
+                    for (int i = 1; i < columnCount; i++)
+                        s += ("," + row[i].ToString().Trim());
+                    s += ";";
+                    writer.WriteLine(s);
+                    writer.Flush();
+                }
             }
 
-            //异形分拣打码
-            table = orderDal.GetOrder(orderDate, batchNo, 4);
-            columnCount = table.Columns.Count;
-            foreach (DataRow row in table.Rows)
+            if (this.isAbnormity)
             {
-                string s = row["SORTNO"].ToString();
-                for (int i = 1; i < columnCount; i++)
-                    s += ("," + row[i].ToString().Trim());
-                s += ";";
-                writer.WriteLine(s);
-                writer.Flush();
+                //异形分拣打码
+                table = orderDal.GetOrder(orderDate, batchNo, 4);
+                columnCount = table.Columns.Count;
+                int index_cigarette = 0;
+                string cigaretteCode = "";
+                foreach (DataRow row in table.Rows)
+                {
+                    if (cigaretteCode != row[4].ToString().Trim())
+                    {
+                        index_cigarette++;
+                        cigaretteCode = row[4].ToString().Trim();
+                    }
+                    string s = row["SORTNO"].ToString();
+                    s += ("," + index_cigarette.ToString());
+
+                    for (int i = 2; i < columnCount; i++)
+                        s += ("," + row[i].ToString().Trim());
+                    s += ";";
+                    writer.WriteLine(s);
+                    writer.Flush();
+                }
             }
 
             file.Close();
@@ -242,7 +286,7 @@ namespace THOK.AS.Schedule
             try
             {
                 DirectoryInfo dir = new DirectoryInfo(parameter["NoOneProFilePath"]);
-                FileInfo[] files = dir.GetFiles("*.Order");
+                FileInfo[] files = dir.GetFiles("*.*Order");
 
                 if (files != null)
                 {

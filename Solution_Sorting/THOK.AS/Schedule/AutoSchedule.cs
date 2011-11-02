@@ -501,7 +501,7 @@ namespace THOK.AS.Schedule
                     {
                         DataRow[] orderRows = null;
                         //查询当前订单明细
-                        orderRows = orderTable.Select(string.Format("ORDERID = '{0}'", masterRow["ORDERID"]), "CHANNELCODE");
+                        orderRows = orderTable.Select(string.Format("ORDERID = '{0}'", masterRow["ORDERID"]), "CIGARETTECODE");
                         DataSet ds = orderSchedule.OptimizeUseWholePiecesSortLine(masterRow, orderRows, channelTable, ref sortNo);
                         orderScheduleDao.SaveOrder(ds);
 
@@ -634,7 +634,7 @@ namespace THOK.AS.Schedule
                     {
                         DataRow[] orderRows = null;
                         //查询当前订单明细
-                        orderRows = orderTable.Select(string.Format("ORDERID = '{0}'", masterRow["ORDERID"]), "CHANNELCODE");
+                        orderRows = orderTable.Select(string.Format("ORDERID = '{0}'", masterRow["ORDERID"]), "CIGARETTECODE");
                         DataTable supplyTable = supplyOptimize.Optimize(channelTable, orderRows,ref serialNo);
                         supplyDao.InsertSupply(supplyTable,true);
 

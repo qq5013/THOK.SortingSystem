@@ -40,9 +40,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
-    <Reference Include="THOK.Util, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="THOK.Util, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\THOK.Util.dll</HintPath>
+      <HintPath>..\..\..\Reference\THOK.Util.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
