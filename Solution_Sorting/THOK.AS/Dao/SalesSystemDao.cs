@@ -49,6 +49,10 @@ namespace THOK.AS.Dao
                     sql = @"SELECT DISTINCT DIST_STA_CODE AS AREACODE,LTRIM(RTRIM(DIST_STA_NAME)) AS AREANAME, 0 AS SORTID " +
                             " FROM IC.V_WMS_DIST_STATION WHERE ISACTIVE ='1'";
                     break;
+                case "ayyc-mssql":
+                    sql = @"SELECT DISTINCT DIST_STA_CODE AS AREACODE,LTRIM(RTRIM(DIST_STA_NAME)) AS AREANAME, 0 AS SORTID " +
+                           " FROM V_WMS_DIST_STATION WHERE ISACTIVE ='1'";
+                    break;
                 default:
                     sql = @"SELECT SALE_REG_CODE AS AREACODE,SALE_REG_NAME AS AREANAME,0 AS SORTID "+
                             " FROM DWV_ORG_SALE_REGION";
@@ -87,6 +91,10 @@ namespace THOK.AS.Dao
                 case "ayyc-db2":
                     sql = @"SELECT DISTINCT DELIVER_LINE_CODE AS ROUTECODE,DELIVER_LINE_NAME AS ROUTENAME,DIST_STA_CODE AS AREACODE, DELIVER_LINE_ORDER AS SORTID " +
                             " FROM IC.V_WMS_DELIVER_LINE WHERE ISACTIVE = '1'";
+                    break;
+                case "ayyc-mssql":
+                    sql = @"SELECT DISTINCT DELIVER_LINE_CODE AS ROUTECODE,DELIVER_LINE_NAME AS ROUTENAME,DIST_STA_CODE AS AREACODE, DELIVER_LINE_ORDER AS SORTID " +
+                            " FROM V_WMS_DELIVER_LINE WHERE ISACTIVE = '1'";
                     break;
                 default:
                     sql = @"SELECT DELIVER_LINE_CODE AS ROUTECODE, DELIVER_LINE_NAME AS ROUTENAME, '', DELIVER_LINE_ORDER AS SORTID, '' "+
@@ -141,6 +149,14 @@ namespace THOK.AS.Dao
                             " LEFT JOIN IC.V_WMS_DELIVER_LINE B ON A.DELIVER_LINE_CODE = B.DELIVER_LINE_CODE" +
                             " WHERE A.ISACTIVE ='1'";
                     break;
+                case "ayyc-mssql":
+                    sql = @"SELECT CUST_CODE AS CUSTOMERCODE,LTRIM(RTRIM(PRINCIPAL_NAME)) AS CUSTOMERNAME," +
+                            " A.DELIVER_LINE_CODE AS ROUTECODE,B.DIST_STA_CODE AS AREACODE,LICENSE_CODE AS LICENSENO," +
+                            " DELIVER_ORDER AS SORTID,DIST_PHONE AS TELNO,DIST_ADDRESS AS ADDRESS,N_CUST_CODE " +
+                            " FROM V_WMS_CUSTOMER A" +
+                            " LEFT JOIN V_WMS_DELIVER_LINE B ON A.DELIVER_LINE_CODE = B.DELIVER_LINE_CODE" +
+                            " WHERE A.ISACTIVE ='1'";
+                    break;
                 default:
                     sql = @"SELECT CUST_CODE AS CUSTOMERCODE,CUST_NAME AS CUSTOMERNAME,DELIVER_LINE_CODE AS ROUTECODE, " +
                             "SALE_REG_CODE AS AREACODE,LICENSE_CODE AS LICENSENO,DELIVER_ORDER AS SORTID, " +
@@ -189,6 +205,12 @@ namespace THOK.AS.Dao
                             " IS_ABNORMITY_BRAND AS ISABNORMITY," +
                             " LTRIM(RTRIM(BARCODE_PIECE)) BARCODE " +
                             " FROM IC.V_WMS_BRAND WHERE ISACTIVE ='1'";
+                    break;
+                case "ayyc-mssql":
+                    sql = @"SELECT LTRIM(RTRIM(BRAND_CODE)) AS CIGARETTECODE,LTRIM(RTRIM(BRAND_NAME)) AS  CIGARETTENAME," +
+                            " IS_ABNORMITY_BRAND AS ISABNORMITY," +
+                            " LTRIM(RTRIM(BARCODE_PIECE)) BARCODE " +
+                            " FROM V_WMS_BRAND WHERE ISACTIVE ='1'";
                     break;
                 default:
                     sql = @"SELECT BRAND_CODE AS CIGARETTECODE,BRAND_NAME AS CIGARETTENAME," +
@@ -246,6 +268,12 @@ namespace THOK.AS.Dao
                             " FROM IC.V_WMS_SORT_ORDER" +
                             " WHERE ORDER_DATE = '{2}' AND DELIVER_LINE_CODE NOT IN ({3}) AND ISACTIVE ='1' ";
                     break;
+                case "ayyc-mssql":
+                    sql = @"SELECT '{0}', {1}, ORDER_ID AS ORDERID,ORG_CODE AS ORGCODE,DIST_STA_CODE AS AREACODE," +
+                            " DELIVER_LINE_CODE AS ROUTECODE,CUST_CODE AS CUSTOMERCODE,DELIVER_ORDER AS SORTID ,DETAIL_NUM AS DETAILNUM,'0' AS IS_IMPORT " +
+                            " FROM V_WMS_SORT_ORDER" +
+                            " WHERE ORDER_DATE = '{2}' AND DELIVER_LINE_CODE NOT IN ({3}) AND ISACTIVE ='1' ";
+                    break;
                 default:
                     sql = @"SELECT '{0}',{1}, ORDER_ID AS ORDERID, SALE_REG_CODE AS AREACODE,DELIVER_LINE_CODE AS ROUTECODE, " +
                             " CUST_CODE AS CUSTOMERCODE,DELIVER_ORDER AS SORTID " +
@@ -300,6 +328,14 @@ namespace THOK.AS.Dao
                             " QTY_DEMAND AS QTYDEMAND,PRICE AS PRICE,AMOUNT AS AMOUNT,'0' AS IS_IMPORT " +
                             " FROM IC.V_WMS_SORT_ORDER_DETAIL A " +
                             " LEFT JOIN IC.V_WMS_SORT_ORDER B ON A.ORDER_ID = B.ORDER_ID" +
+                            " WHERE B.ORDER_DATE = '{2}' AND B.DELIVER_LINE_CODE NOT IN ({3}) AND A.QUANTITY > 0 ";
+                    break;
+                case "ayyc-mssql":
+                    sql = @"SELECT A.ORDER_DETAIL_ID AS ORDERDETAILID,A.ORDER_ID AS ORDERID,LTRIM(RTRIM(A.BRAND_CODE)) AS CIGARETTECODE, " +
+                            " LTRIM(RTRIM(A.BRAND_NAME)) AS CIGARETTENAME,'Ìõ' AS UTINNAME,A.QUANTITY AS QUANTITY,0,0,'{0}',{1}," +
+                            " QTY_DEMAND AS QTYDEMAND,PRICE AS PRICE,AMOUNT AS AMOUNT,'0' AS IS_IMPORT " +
+                            " FROM V_WMS_SORT_ORDER_DETAIL A " +
+                            " LEFT JOIN V_WMS_SORT_ORDER B ON A.ORDER_ID = B.ORDER_ID" +
                             " WHERE B.ORDER_DATE = '{2}' AND B.DELIVER_LINE_CODE NOT IN ({3}) AND A.QUANTITY > 0 ";
                     break;
                 default:
