@@ -34,7 +34,10 @@
                                         <asp:Button ID="btnQuery" runat="server" CssClass="ButtonQuery" OnClick="btnQuery_Click"
                                             OnClientClick="return CheckCondition();" Text="查询" /><asp:Button ID="btnExit" runat="server"
                                                 CssClass="ButtonExit" OnClientClick="return Exit();" Text="退出" OnClick="btnExit_Click" />
-                                        <asp:LinkButton ID="lnkBtnGetBatchNo" runat="server" OnClick="lnkBtnGetBatchNo_Click"></asp:LinkButton></TD>
+                                        <asp:LinkButton ID="lnkBtnGetBatchNo" runat="server" OnClick="lnkBtnGetBatchNo_Click"></asp:LinkButton>
+                                        <asp:TextBox ID="txtCusCode" runat="server" CssClass="TextBox"></asp:TextBox>
+                                        <asp:Button ID="btnQueryCust" runat="server" CssClass="ButtonQuery" OnClick="btnQueryCust_Click"
+                                            OnClientClick="return CheckCondition();" Text="按户查询" /></TD>
                                 </TR>
                             </TBODY>
                         </TABLE>
@@ -59,6 +62,8 @@
                                     <asp:BoundField DataField="ORDERID" HeaderText="订单号">
                                         <HeaderStyle Width="80px" />
                                     </asp:BoundField>
+                                    <asp:BoundField DataField="BATCHNO" HeaderText="批次号" />
+                                    <asp:BoundField DataField="ORDERDATE" HeaderText="订单日期" />
                                 </Columns>
 
                                 <RowStyle BackColor="White" Height="28px"></RowStyle>

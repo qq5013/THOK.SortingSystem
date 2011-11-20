@@ -145,5 +145,17 @@ namespace THOK.AS.Dao
 	                            ORDER BY A.ROUTECODE ";
             return (ExecuteQuery(string.Format(sql, orderDate, batchNo)).Tables[0].Rows.Count == 0);
         }
+
+        /// <summary>
+        /// 查询本次优化的总数量
+        /// </summary>
+        /// <param name="orderDate"></param>
+        /// <param name="batchNo"></param>
+        /// <returns></returns>
+        public int BatchCount(string orderDate, int batchNo)
+        {
+            string sql = @"SELECT SUM(QUANTITY) FROM DBO.AS_I_ORDERDETAIL WHERE ORDERDATE='{0}' AND BATCHNO={1}";
+            return Convert.ToInt32(ExecuteQuery(string.Format( sql,orderDate,batchNo)).Tables[0].Rows[0][0]);
+        }
     }
 }

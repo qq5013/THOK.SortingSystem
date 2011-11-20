@@ -12,6 +12,7 @@ namespace THOK.AS.Schedule
 {
     public class AutoSchedule
     {
+        int batchCount = 0;
         public event ScheduleEventHandler OnSchedule = null;
 
         /// <summary>
@@ -233,10 +234,11 @@ namespace THOK.AS.Schedule
                     }
                     batchDao.SelectBalanceIntoHistory(orderDate, batchNo);
                     batchDao.UpdateIsValid(orderDate, batchNo, "1");
+                    batchCount= batchDao.BatchCount(orderDate,batchNo);
                 }
 
                 if (OnSchedule != null)
-                    OnSchedule(this, new ScheduleEventArgs(OptimizeStatus.COMPLETE));
+                    OnSchedule(this, new ScheduleEventArgs(OptimizeStatus.COMPLETE,Convert.ToString(batchCount)));
                 
             }
             catch (Exception e)

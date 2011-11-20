@@ -90,4 +90,10 @@ public partial class Code_Query_OrderQuery : BasePage
         detailPageIndex = e.NewPageIndex;
         BindDetailData();
     }
+    protected void btnQueryCust_Click(object sender, EventArgs e)
+    {
+        pageIndex = 1;
+        ViewState["Filter"] = string.Format("A.ORDERDATE='{0}' AND A.BATCHNO='{1}' AND A.CUSTOMERCODE='{2}'", txtOrderDate.Text, ddlBatchNo.SelectedValue, txtCusCode.Text);
+        BindData();
+    }
 }
