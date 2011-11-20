@@ -108,6 +108,17 @@
                                     <asp:TextBox ID="txtNO1Batch" runat="server" CssClass="TextBox" MaxLength="10"></asp:TextBox></td>
                             </tr>
                         </table>
+                        <table width="100%">
+                            <tr>
+                                <td class="tdTitle">
+                                    <font color="red">*</font>一号工程状态值:</td>
+                                <td>
+                                    <asp:DropDownList ID="DDLNo1State" runat="server" CssClass="TEXTBOX">
+                                        <asp:ListItem Value="1">已上传</asp:ListItem>
+                                        <asp:ListItem Value="0">未上传</asp:ListItem>
+                                    </asp:DropDownList></td>
+                            </tr>
+                        </table>
                     </asp:Panel>
                 </asp:Panel>
             </ContentTemplate>

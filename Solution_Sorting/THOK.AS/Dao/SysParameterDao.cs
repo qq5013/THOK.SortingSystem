@@ -29,5 +29,16 @@ namespace THOK.AS.Dao
                 ExecuteNonQuery(sqlCreate.GetSQL());
             }
         }
+
+        /// <summary>
+        /// 2011-11-21 wu
+        /// </summary>
+        /// <param name="parameterValue"></param>
+        /// <param name="parameterName"></param>
+        public void UpdateParameter(string parameterValue, string parameterName)
+        {
+            string sql = string.Format("UPDATE AS_SYS_PARAMETER SET PARAMETERVALUE ='{0}' WHERE PARAMETERNAME='{1}'", parameterValue, parameterName);
+            ExecuteNonQuery(sql);
+        }
     }
 }

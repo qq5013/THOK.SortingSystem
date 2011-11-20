@@ -65,7 +65,7 @@ namespace THOK.AS.Schedule
         /// </summary>
         /// <param name="orderDate"></param>
         /// <param name="batchNo"></param>
-        public void DownloadData(string orderDate, int batchNo)
+        public void DownloadData(string orderDate, int batchNo,string dataBase)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace THOK.AS.Schedule
                 using (PersistentManager pm = new PersistentManager())
                 {
                     BatchDao batchDao = new BatchDao();
-                    using (PersistentManager ssPM = new PersistentManager("OuterConnection"))
+                    using (PersistentManager ssPM = new PersistentManager(dataBase))
                     {
                         SalesSystemDao ssDao = new SalesSystemDao();
                         ssDao.SetPersistentManager(ssPM);

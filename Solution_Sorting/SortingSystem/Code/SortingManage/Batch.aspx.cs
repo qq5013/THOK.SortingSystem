@@ -96,7 +96,7 @@ public partial class Code_SortingManage_Batch : BasePage
     {
         //保存修改到数据库
         BatchDal batchDal = new BatchDal();
-        batchDal.Save(txtOrderDate.Text, txtSortBatch.Text,txtNO1Batch.Text);
+        batchDal.Save(txtOrderDate.Text, txtSortBatch.Text,txtNO1Batch.Text,DDLNo1State.SelectedValue.ToString());
         JScript.Instance.ShowMessage(UpdatePanel1, "保存数据成功。");
     }
 

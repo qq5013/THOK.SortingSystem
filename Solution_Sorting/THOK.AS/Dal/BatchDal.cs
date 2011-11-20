@@ -78,12 +78,12 @@ namespace THOK.AS.Dal
             }
         }
 
-        public void Save(string orderDate, string sortBatch, string no1Batch)
+        public void Save(string orderDate, string sortBatch, string no1Batch,string no1UpLoadState)
         {
             using (PersistentManager pm = new PersistentManager())
             {
                 BatchDao batchDao = new BatchDao();
-                batchDao.UpdateEntity(orderDate,sortBatch,no1Batch);
+                batchDao.UpdateEntity(orderDate,sortBatch,no1Batch,no1UpLoadState);
             }
         }
     }

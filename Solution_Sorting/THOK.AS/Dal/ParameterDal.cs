@@ -28,5 +28,19 @@ namespace THOK.AS.Dal
                 parameterDao.UpdateEntity(parameters);
             }
         }
+
+        /// <summary>
+        /// 2011-11-21 wu
+        /// </summary>
+        /// <param name="parameterValue"></param>
+        /// <param name="parameterName"></param>
+        public void UpdateParameter(string parameterValue,string parameterName)
+        {
+            using (PersistentManager pm = new PersistentManager())
+            {
+                SysParameterDao parameterDao = new SysParameterDao();
+                parameterDao.UpdateParameter(parameterValue,parameterName);
+            }
+        }
     }
 }

@@ -104,10 +104,10 @@ namespace THOK.AS.Dao
         }
 
 
-        internal void UpdateEntity(string orderDate, string sortBatch, string no1Batch)
+        internal void UpdateEntity(string orderDate, string sortBatch, string no1Batch,string no1UpLoadState)
         {
-            string sql = "UPDATE AS_BI_BATCH SET BATCHNO_ONEPRO = {0} WHERE ORDERDATE='{1}' AND BATCHNO='{2}'";
-            ExecuteNonQuery(string.Format(sql,no1Batch,orderDate,sortBatch));
+            string sql = "UPDATE AS_BI_BATCH SET BATCHNO_ONEPRO = {0},ISUPTONOONEPRO='{3}' WHERE ORDERDATE='{1}' AND BATCHNO='{2}'";
+            ExecuteNonQuery(string.Format(sql, no1Batch, orderDate, sortBatch, no1UpLoadState));
         }
 
         internal void SelectBalanceIntoHistory(string orderDate, int batchNo)

@@ -49,6 +49,8 @@ public partial class Code_SortingManage_Default : BasePage
     {
         if (txtOrderDate.Text.Trim().Length != 0)
         {
+            ParameterDal pDal = new ParameterDal();
+            pDal.UpdateParameter(ddlInterface.SelectedValue.ToString(), "SALESSYSTEMDBTYPE");
             Session["OptimizeStatus"] = "<root><status>Waiting</status><message></message></root>";
             int batchNo = Convert.ToInt32(ddlBatchNo.SelectedItem.Text);
             bool canOptimize = false;
@@ -67,6 +69,7 @@ public partial class Code_SortingManage_Default : BasePage
 
                     Session["OrderDate"] = txtOrderDate.Text;
                     Session["BatchNo"] = batchNo;
+                    Session["DataBase"] = ddlInterface.SelectedItem.Text;
 
                     batchDal.SaveExecuter(Session["G_user"].ToString(), Session["Client_IP"].ToString(), txtOrderDate.Text, batchNo);
                     canOptimize = true;
@@ -143,7 +146,7 @@ public partial class Code_SortingManage_Default : BasePage
     {
         try
         {
-            schedule.DownloadData(Session["OrderDate"].ToString(), Convert.ToInt32(Session["BatchNo"]));
+            schedule.DownloadData(Session["OrderDate"].ToString(), Convert.ToInt32(Session["BatchNo"]),Session["DataBase"].ToString());
             Session["OptimizeStatus"] = "<root><status>SwitchView</status><message></message></root>";
         }
         catch (Exception)
@@ -166,7 +169,7 @@ public partial class Code_SortingManage_Default : BasePage
     /// </summary>
     private void OptimizeAll()
     {
-        schedule.DownloadData(Session["OrderDate"].ToString(), Convert.ToInt32(Session["BatchNo"]));
+        schedule.DownloadData(Session["OrderDate"].ToString(), Convert.ToInt32(Session["BatchNo"]), Session["DataBase"].ToString());
         schedule.GenSchedule(Session["OrderDate"].ToString(), Convert.ToInt32(Session["BatchNo"]));
         AfterOptimize();
     }
