@@ -154,7 +154,7 @@ namespace THOK.AS.Dao
         /// <returns></returns>
         public int BatchCount(string orderDate, int batchNo)
         {
-            string sql = @"SELECT SUM(QUANTITY) FROM DBO.AS_I_ORDERDETAIL WHERE ORDERDATE='{0}' AND BATCHNO={1}";
+            string sql = @"SELECT SUM(ORDER_QUANTITY) FROM DBO.AS_I_ORDERDETAIL WHERE ORDERDATE='{0}' AND BATCHNO={1}";
             return Convert.ToInt32(ExecuteQuery(string.Format( sql,orderDate,batchNo)).Tables[0].Rows[0][0]);
         }
     }

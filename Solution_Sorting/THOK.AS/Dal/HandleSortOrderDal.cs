@@ -57,5 +57,38 @@ namespace THOK.AS.Dal
                 handleSortOrderDao.DeleteEntity(orderDate, orderId);
             }
         }
+
+        /// <summary>
+        /// 根据条件查询出该条记录在分拣订单细表的数量 2011-12-11 wu
+        /// </summary>
+        /// <param name="orderId">订单号</param>
+        /// <param name="orderDate">订单日期</param>
+        /// <param name="batchNo">批次号</param>
+        /// <param name="cigaretteCode">卷烟代码</param>
+        public int GetQuantityByValue(string orderId, string orderDate, string batchNo, string cigaretteCode)
+        {
+            using (PersistentManager pm = new PersistentManager())
+            {
+                HandleSortOrderDao handleSortOrderDao = new HandleSortOrderDao();
+                return handleSortOrderDao.GetQuantityByValue(orderId, orderDate, batchNo, cigaretteCode);
+            }
+        }
+
+        /// <summary>
+        ///  根据条件修改改记录的分拣数量 2011-12-11 wu
+        /// </summary>
+        /// <param name="quantity">实际分拣数量</param>
+        /// <param name="orderId">订单号</param>
+        /// <param name="orderDate">订单日期</param>
+        /// <param name="batchNo">批次号</param>
+        /// <param name="cigaretteCode">卷烟代码</param>
+        public void updateSortQuantity(int quantity, string orderId, string orderDate, string batchNo, string cigaretteCode)
+        {
+            using (PersistentManager pm = new PersistentManager())
+            {
+                HandleSortOrderDao handleSortOrderDao = new HandleSortOrderDao();
+                handleSortOrderDao.UpdateSortQuantity(quantity, orderId, orderDate, batchNo, cigaretteCode);
+            }
+        }
     }
 }
