@@ -325,7 +325,7 @@ namespace THOK.AS.Dao
                 case "ayyc-db2":
                     sql = @"SELECT A.ORDER_DETAIL_ID AS ORDERDETAILID,A.ORDER_ID AS ORDERID,LTRIM(RTRIM(A.BRAND_CODE)) AS CIGARETTECODE, " +
                             " LTRIM(RTRIM(A.BRAND_NAME)) AS CIGARETTENAME,'Ìõ' AS UTINNAME,A.QUANTITY AS QUANTITY,0,0,'{0}',{1}," +
-                            " QTY_DEMAND AS QTYDEMAND,PRICE AS PRICE,AMOUNT AS AMOUNT,'0' AS IS_IMPORT " +
+                            " QTY_DEMAND AS QTYDEMAND,PRICE AS PRICE,AMOUNT AS AMOUNT,'0' AS IS_IMPORT,A.QUANTITY AS ORDER_QUANTITY " +
                             " FROM IC.V_WMS_SORT_ORDER_DETAIL A " +
                             " LEFT JOIN IC.V_WMS_SORT_ORDER B ON A.ORDER_ID = B.ORDER_ID" +
                             " WHERE B.ORDER_DATE = '{2}' AND B.DELIVER_LINE_CODE NOT IN ({3}) AND A.QUANTITY > 0 ";
@@ -333,7 +333,7 @@ namespace THOK.AS.Dao
                 case "ayyc-mssql":
                     sql = @"SELECT A.ORDER_DETAIL_ID AS ORDERDETAILID,A.ORDER_ID AS ORDERID,LTRIM(RTRIM(A.BRAND_CODE)) AS CIGARETTECODE, " +
                             " LTRIM(RTRIM(A.BRAND_NAME)) AS CIGARETTENAME,'Ìõ' AS UTINNAME,A.QUANTITY AS QUANTITY,0,0,'{0}',{1}," +
-                            " QTY_DEMAND AS QTYDEMAND,PRICE AS PRICE,AMOUNT AS AMOUNT,'0' AS IS_IMPORT " +
+                            " QTY_DEMAND AS QTYDEMAND,PRICE AS PRICE,AMOUNT AS AMOUNT,'0' AS IS_IMPORT,A.QUANTITY AS ORDER_QUANTITY " +
                             " FROM V_WMS_SORT_ORDER_DETAIL A " +
                             " LEFT JOIN V_WMS_SORT_ORDER B ON A.ORDER_ID = B.ORDER_ID" +
                             " WHERE B.ORDER_DATE = '{2}' AND B.DELIVER_LINE_CODE NOT IN ({3}) AND A.QUANTITY > 0 ";
