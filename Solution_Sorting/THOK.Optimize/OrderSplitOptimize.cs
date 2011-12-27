@@ -19,8 +19,16 @@ namespace THOK.Optimize
         private bool isTwoChannelMoveToMixChannel = false;
         private int moveToMixChannelProductsCount = 0;
         public IList<string> moveToMixChannelProducts = new List<string>();
-
+        
         private bool isCombineOrder = false;
+
+        public class PackerInfo
+        {
+            public int exportNo = 1;
+            public int quantity = 0;
+            public int packMode = 0; //(0：正常PE包装；1：周转箱连续客户合装包装)
+        }
+        private PackerInfo packerInfo = new PackerInfo();
 
         //优化开始；
         public DataSet Optimize(DataRow masterRow, DataRow[] orderRows, DataTable channelTable, string lineCode, ref int sortNo, Dictionary<string, string> param, bool isUseWholePiecesSortLine)
@@ -33,6 +41,7 @@ namespace THOK.Optimize
             moveToMixChannelProductsCount = Convert.ToInt32(param["MoveToMixChannelProductsCount-" + lineCode]);
 
             isCombineOrder = Convert.ToBoolean(param["IsCombineOrder"]);
+            packerInfo.packMode = Convert.ToInt32(param["PackMode"]);
 
             Dictionary<string, int> product = new Dictionary<string, int>();
             DataTable tmpDetail = GetEmptyOrderDetail();
@@ -523,10 +532,21 @@ namespace THOK.Optimize
             ds.Tables.Add(detailTable);
             return ds;
         }
+        
         //对一条分拣主线的订单进行拆分
         private int SplitOrder(DataRow masterRow, DataTable detailTable, DataTable tmpTable, int sortNo, string lineCode, int[] groupQuantity, int channelGroup, int orderNo, int exportNo,string sort)
         {
             int quantity = 0;
+            if (packerInfo.packMode == 1)
+            {
+                if (packerInfo.quantity == splitOrderQuantity)
+                {
+                    packerInfo.exportNo = packerInfo.exportNo == 2 ? 1 : 2;
+                    packerInfo.quantity = 0;
+                }
+                exportNo = packerInfo.exportNo;
+                quantity = packerInfo.quantity;
+            }
             if (groupQuantity[channelGroup - 1] > 0)
             {
                 DataRow[] orderRows = tmpTable.Select(string.Format("CHANNELGROUP={0} AND QUANTITY > 0", channelGroup),string.Format("CHANNELTYPE {0},QUANTITY DESC,CHANNELORDER DESC",sort));
@@ -543,6 +563,7 @@ namespace THOK.Optimize
                         newQuantity = 15;
 
                     quantity += newQuantity;
+                    packerInfo.quantity += newQuantity;
                     groupQuantity[channelGroup -1 ] -= newQuantity;
                     orderQuantity -= newQuantity;
                     tmpQuantity -= newQuantity;
