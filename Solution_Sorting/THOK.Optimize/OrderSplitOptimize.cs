@@ -27,6 +27,7 @@ namespace THOK.Optimize
             public int exportNo = 1;
             public int quantity = 0;
             public int packMode = 0; //(0：正常PE包装；1：周转箱连续客户合装包装)
+            public string routeCode = "";
         }
         private PackerInfo packerInfo = new PackerInfo();
 
@@ -539,7 +540,13 @@ namespace THOK.Optimize
             int quantity = 0;
             if (packerInfo.packMode == 1)
             {
-                if (packerInfo.quantity == splitOrderQuantity)
+                if (packerInfo.routeCode != masterRow["ROUTECODE"].ToString())
+                {
+                    packerInfo.exportNo = 1;
+                    packerInfo.quantity = 0;
+                    packerInfo.routeCode = masterRow["ROUTECODE"].ToString();
+                }
+                else if (packerInfo.quantity == splitOrderQuantity)
                 {
                     packerInfo.exportNo = packerInfo.exportNo == 2 ? 1 : 2;
                     packerInfo.quantity = 0;
