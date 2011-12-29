@@ -522,8 +522,8 @@ namespace THOK.Optimize
                 else
                     sort = "";
 
-                quantity[0] = SplitOrder(masterRow, detailTable, tmpTable, sortNo, lineCode, groupQuantity, 1, orderNo, groupQuantity[0] >= splitOrderQuantity ? 1 : exportNoLast, sort);
                 quantity[1] = SplitOrder(masterRow, detailTable, tmpTable, sortNo, lineCode, groupQuantity, 2, orderNo, groupQuantity[1] >= splitOrderQuantity ? 2 : exportNoLast, sort);
+                quantity[0] = SplitOrder(masterRow, detailTable, tmpTable, sortNo, lineCode, groupQuantity, 1, orderNo, groupQuantity[0] >= splitOrderQuantity ? 1 : exportNoLast, sort);
 
                 AddMasterRow(masterTable, masterRow, sortNo++, orderNo++, quantity,exportNoLast);
             }
