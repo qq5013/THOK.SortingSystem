@@ -186,6 +186,7 @@ namespace THOK.AS.Dao
 
                 sql.Append("EXPORTNO", orderRow["EXPORTNO"]);
                 sql.Append("EXPORTNO1", orderRow["EXPORTNO1"]);
+                sql.Append("PACKNO", orderRow["PACKNO"]);
 
                 ExecuteNonQuery(sql.GetSQL());
             }
@@ -214,6 +215,7 @@ namespace THOK.AS.Dao
                 sql.Append("CHANNELGROUP", orderRow["CHANNELGROUP"]);
                 sql.Append("CHANNELORDER", orderRow["CHANNELORDER"]);
                 sql.Append("EXPORTNO", orderRow["EXPORTNO"]);
+                sql.Append("PACKNO", orderRow["PACKNO"]);
                 ExecuteNonQuery(sql.GetSQL());
             }
         }

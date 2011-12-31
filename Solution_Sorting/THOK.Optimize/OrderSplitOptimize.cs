@@ -24,10 +24,13 @@ namespace THOK.Optimize
 
         public class PackerInfo
         {
-            public int exportNo = 1;
-            public int quantity = 0;
             public int packMode = 0; //(0：正常PE包装；1：周转箱连续客户合装包装)
+            public string lineCode = "";
             public string routeCode = "";
+            public string orderId = "";
+            public int packNo = 0;
+            public int exportNo = 1;
+            public int quantity = 0;            
         }
         private PackerInfo packerInfo = new PackerInfo();
 
@@ -522,8 +525,8 @@ namespace THOK.Optimize
                 else
                     sort = "";
 
-                quantity[1] = SplitOrder(masterRow, detailTable, tmpTable, sortNo, lineCode, groupQuantity, 2, orderNo, groupQuantity[1] >= splitOrderQuantity ? 2 : exportNoLast, sort);
-                quantity[0] = SplitOrder(masterRow, detailTable, tmpTable, sortNo, lineCode, groupQuantity, 1, orderNo, groupQuantity[0] >= splitOrderQuantity ? 1 : exportNoLast, sort);
+                quantity[1] = SplitOrder(masterRow, detailTable, tmpTable, sortNo, lineCode, groupQuantity, 2, orderNo, groupQuantity[1] > splitOrderQuantity ? 2 : exportNoLast, sort);
+                quantity[0] = SplitOrder(masterRow, detailTable, tmpTable, sortNo, lineCode, groupQuantity, 1, orderNo, groupQuantity[0] > splitOrderQuantity ? 1 : exportNoLast, sort);
 
                 AddMasterRow(masterTable, masterRow, sortNo++, orderNo++, quantity,exportNoLast);
             }
@@ -537,6 +540,7 @@ namespace THOK.Optimize
         //对一条分拣主线的订单进行拆分
         private int SplitOrder(DataRow masterRow, DataTable detailTable, DataTable tmpTable, int sortNo, string lineCode, int[] groupQuantity, int channelGroup, int orderNo, int exportNo,string sort)
         {
+            int packNo = 0;
             int quantity = 0;
             if (packerInfo.packMode == 1)
             {
@@ -554,8 +558,39 @@ namespace THOK.Optimize
                 exportNo = packerInfo.exportNo;
                 quantity = packerInfo.quantity;
             }
-            if (groupQuantity[channelGroup - 1] > 0)
+            else if (packerInfo.packMode == 2)
             {
+                if (packerInfo.lineCode != masterRow["LINECODE"].ToString())
+                {
+                    packerInfo.packNo = 0;
+                    packerInfo.lineCode = masterRow["LINECODE"].ToString();
+                }
+                if (packerInfo.orderId != masterRow["ORDERID"].ToString())
+                {
+                    packerInfo.packNo++;
+                    packerInfo.orderId = masterRow["ORDERID"].ToString();
+                }
+
+                if (groupQuantity[channelGroup - 1] > splitOrderQuantity)
+                {
+                    packNo = packerInfo.packNo++;
+                }
+                else
+                {
+                    packNo = packerInfo.packNo;
+                }
+            }
+            if (groupQuantity[channelGroup - 1] > 0)
+            {              
+                masterRow["PACKNO"] = packNo;
+                if (channelGroup == 1)
+                {
+                    masterRow["EXPORTNO"] = exportNo;
+                }else
+                {
+                    masterRow["EXPORTNO1"] = exportNo;
+                }
+
                 DataRow[] orderRows = tmpTable.Select(string.Format("CHANNELGROUP={0} AND QUANTITY > 0", channelGroup),string.Format("CHANNELTYPE {0},QUANTITY DESC,CHANNELORDER DESC",sort));
                 foreach (DataRow orderRow in orderRows)
                 {
@@ -578,6 +613,7 @@ namespace THOK.Optimize
                     orderRow["QUANTITY"] = orderQuantity;
                     orderRow["ORDERNO"] = orderNo;
                     orderRow["EXPORTNO"] = exportNo;
+                    orderRow["PACKNO"] = packNo;//数据库需要增加相应字段；                  
 
                     AddDetailRow(masterRow, detailTable, sortNo, lineCode, orderRow, newQuantity);
                     if (tmpQuantity == 0)
@@ -622,6 +658,7 @@ namespace THOK.Optimize
                         
             table.Columns.Add("EXPORTNO", typeof(Int32));
             table.Columns.Add("EXPORTNO1", typeof(Int32));
+            table.Columns.Add("PACKNO", typeof(Int32));
             return table;
         }
 
@@ -645,6 +682,7 @@ namespace THOK.Optimize
             table.Columns.Add("CHANNELORDER", typeof(Int32));
             table.Columns.Add("CHANNELTYPE");
             table.Columns.Add("EXPORTNO", typeof(Int32));
+            table.Columns.Add("PACKNO", typeof(Int32));
             return table;
         }
 
@@ -679,8 +717,9 @@ namespace THOK.Optimize
 
             newRow["ABNORMITY_QUANTITY"] = masterRow["ABNORMITY_QUANTITY"];
 
-            newRow["EXPORTNO"] = quantity[0] == splitOrderQuantity ? 1 : exportNoLast;
-            newRow["EXPORTNO1"] = quantity[1] == splitOrderQuantity ? 2 : exportNoLast;
+            newRow["EXPORTNO"] = masterRow["EXPORTNO"];
+            newRow["EXPORTNO1"] = masterRow["EXPORTNO1"];
+            newRow["PACKNO"] = masterRow["PACKNO"];
 
             masterTable.Rows.Add(newRow);
         }
@@ -717,6 +756,5 @@ namespace THOK.Optimize
                 detailTable.Rows.Add(newRow);
             }
         }
-
     }
 }

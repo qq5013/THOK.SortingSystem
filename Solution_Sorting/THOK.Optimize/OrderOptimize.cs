@@ -29,9 +29,9 @@ namespace THOK.Optimize
                     channelRows[0]["CIGARETTENAME"] = detailRow["CIGARETTENAME"];
                 }
                 if (detailRow["CHANNELGROUP"].ToString() == "1")
-                    Optimize(masterRow, channelRows[0], detailTable, supplyTable, Convert.ToInt32(detailRow["QUANTITY"]), ref sort1,Convert.ToInt32(detailRow["ORDERNO"]),Convert.ToInt32(detailRow["EXPORTNO"]));
+                    Optimize(masterRow, channelRows[0], detailTable, supplyTable, Convert.ToInt32(detailRow["QUANTITY"]), ref sort1, Convert.ToInt32(detailRow["ORDERNO"]), Convert.ToInt32(detailRow["EXPORTNO"]), Convert.ToInt32(detailRow["PACKNO"]));
                 else
-                    Optimize(masterRow, channelRows[0], detailTable, supplyTable, Convert.ToInt32(detailRow["QUANTITY"]), ref sort2, Convert.ToInt32(detailRow["ORDERNO"]), Convert.ToInt32(detailRow["EXPORTNO"]));
+                    Optimize(masterRow, channelRows[0], detailTable, supplyTable, Convert.ToInt32(detailRow["QUANTITY"]), ref sort2, Convert.ToInt32(detailRow["ORDERNO"]), Convert.ToInt32(detailRow["EXPORTNO"]), Convert.ToInt32(detailRow["PACKNO"]));
             }
 
             int sort = sort1 > sort2 ? sort1 - sortNo : sort2 - sortNo;
@@ -92,7 +92,7 @@ namespace THOK.Optimize
 
                     for (int i = 0; i < Convert.ToInt32(detailRow["QUANTITY"]) / 50; i++)
                     {
-                        AddDetail(masterRow, channelRows[0], detailTable, sortNo,50, orderNo++, 1);
+                        AddDetail(masterRow, channelRows[0], detailTable, sortNo,50, orderNo++, 1,1);
                         AddMaster(masterRow, masterTable, sortNo++, quantity, 0);
                     }                    
 
@@ -107,7 +107,7 @@ namespace THOK.Optimize
             return ds;
         }
 
-        private void Optimize(DataRow masterRow, DataRow channelRow, DataTable detailTable, DataTable supplyTable, int quantity, ref int sortNo,int orderNo,int exportNo)
+        private void Optimize(DataRow masterRow, DataRow channelRow, DataTable detailTable, DataTable supplyTable, int quantity, ref int sortNo,int orderNo,int exportNo,int packNo)
         {
             /**
              * 
@@ -259,7 +259,7 @@ namespace THOK.Optimize
             {
                 if (i != 0)
                     sortNo++;
-                AddDetail(masterRow, channelRow, detailTable, sortNo, orderQuantity[i],orderNo,exportNo);
+                AddDetail(masterRow, channelRow, detailTable, sortNo, orderQuantity[i],orderNo,exportNo,packNo);
 
                 //记录分拣倒数第3条的订单号
                 if (tmpQuantity >= 8 && tmpQuantity - orderQuantity[i] <= 8)
@@ -324,11 +324,12 @@ namespace THOK.Optimize
 
             newRow["EXPORTNO"] = masterRow["EXPORTNO"];
             newRow["EXPORTNO1"] = masterRow["EXPORTNO1"];
+            newRow["PACKNO"] = masterRow["PACKNO"];
 
             masterTable.Rows.Add(newRow);
         }
 
-        private void AddDetail(DataRow masterRow, DataRow channelRow, DataTable detailTable, int sortNo, int quantity,int orderNo,int exportNo)
+        private void AddDetail(DataRow masterRow, DataRow channelRow, DataTable detailTable, int sortNo, int quantity,int orderNo,int exportNo,int packNo)
         {
             DataRow newRow = detailTable.NewRow();
             newRow["ORDERDATE"] = masterRow["ORDERDATE"];
@@ -344,6 +345,7 @@ namespace THOK.Optimize
             newRow["CHANNELGROUP"] = channelRow["CHANNELGROUP"];
             newRow["CHANNELORDER"] = channelRow["CHANNELORDER"];
             newRow["EXPORTNO"] = exportNo;
+            newRow["PACKNO"] = packNo;
 
             detailTable.Rows.Add(newRow);
         }
@@ -395,6 +397,7 @@ namespace THOK.Optimize
 
             table.Columns.Add("EXPORTNO", typeof(Int32));
             table.Columns.Add("EXPORTNO1", typeof(Int32));
+            table.Columns.Add("PACKNO", typeof(Int32));
 
             return table;
         }
@@ -417,6 +420,7 @@ namespace THOK.Optimize
             table.Columns.Add("CHANNELGROUP");
             table.Columns.Add("CHANNELORDER");
             table.Columns.Add("EXPORTNO", typeof(Int32));
+            table.Columns.Add("PACKNO", typeof(Int32));
             return table;
         }
 

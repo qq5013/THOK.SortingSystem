@@ -277,7 +277,8 @@ namespace THOK.AS.Dao
                     " ROW_NUMBER() over (ORDER BY  C.SORTID,D.SORTID,A.ROUTECODE, E.SORTID) CUSTOMERSORTNO," +
 
                     //°ü×´»úºÅ
-                    " 1 EXPORTNO, 1 EXPORTNO1, '0', NULL" +  
+                    " 1 EXPORTNO, 1 EXPORTNO1, '0', NULL ," +  
+                    " 0 PACKNO "+
           
                     " FROM AS_I_ORDERMASTER A " +
                     " LEFT JOIN AS_SC_LINE B ON A.ROUTECODE = B.ROUTECODE  AND A.ORDERDATE = B.ORDERDATE AND A.BATCHNO = B.BATCHNO " +
