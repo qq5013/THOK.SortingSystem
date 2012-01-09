@@ -562,7 +562,14 @@ namespace THOK.Optimize
                     packerInfo.quantity = 0;
                 }
                 exportNo = packerInfo.exportNo;
-                quantity = packerInfo.quantity % splitOrderQuantity;
+                if (packerInfo.splitPackQuantity - packerInfo.quantity >= splitOrderQuantity)
+                {
+                    quantity = 0;
+                }
+                else
+                {
+                    quantity = packerInfo.quantity % splitOrderQuantity;  
+                }                
             }
             else if (packerInfo.packMode == 2)
             {
