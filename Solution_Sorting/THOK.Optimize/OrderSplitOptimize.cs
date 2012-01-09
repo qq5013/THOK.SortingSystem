@@ -30,7 +30,8 @@ namespace THOK.Optimize
             public string orderId = "";
             public int packNo = 0;
             public int exportNo = 1;
-            public int quantity = 0;            
+            public int quantity = 0;
+            public int splitPackQuantity = 0;
         }
         private PackerInfo packerInfo = new PackerInfo();
 
@@ -46,6 +47,7 @@ namespace THOK.Optimize
 
             isCombineOrder = Convert.ToBoolean(param["IsCombineOrder"]);
             packerInfo.packMode = Convert.ToInt32(param["PackMode"]);
+            packerInfo.splitPackQuantity = Convert.ToInt32(param["SplitPackQuantity"]);
 
             Dictionary<string, int> product = new Dictionary<string, int>();
             DataTable tmpDetail = GetEmptyOrderDetail();
@@ -544,19 +546,23 @@ namespace THOK.Optimize
             int quantity = 0;
             if (packerInfo.packMode == 1)
             {
+                if (packerInfo.splitPackQuantity % splitOrderQuantity != 0)
+                {
+                    throw new Exception("packerInfo.splitPackQuantity 除以 splitOrderQuantity 不是整理数倍！ ");
+                }
                 if (packerInfo.routeCode != masterRow["ROUTECODE"].ToString())
                 {
                     packerInfo.exportNo = 1;
                     packerInfo.quantity = 0;
                     packerInfo.routeCode = masterRow["ROUTECODE"].ToString();
                 }
-                else if (packerInfo.quantity == splitOrderQuantity)
+                else if (packerInfo.quantity == packerInfo.splitPackQuantity)
                 {
                     packerInfo.exportNo = packerInfo.exportNo == 2 ? 1 : 2;
                     packerInfo.quantity = 0;
                 }
                 exportNo = packerInfo.exportNo;
-                quantity = packerInfo.quantity;
+                quantity = packerInfo.quantity % splitOrderQuantity;
             }
             else if (packerInfo.packMode == 2)
             {
