@@ -325,6 +325,7 @@ namespace THOK.Optimize
             newRow["EXPORTNO"] = masterRow["EXPORTNO"];
             newRow["EXPORTNO1"] = masterRow["EXPORTNO1"];
             newRow["PACKNO"] = masterRow["PACKNO"];
+            newRow["PACKNO1"] = masterRow["PACKNO1"];
 
             masterTable.Rows.Add(newRow);
         }
@@ -398,7 +399,7 @@ namespace THOK.Optimize
             table.Columns.Add("EXPORTNO", typeof(Int32));
             table.Columns.Add("EXPORTNO1", typeof(Int32));
             table.Columns.Add("PACKNO", typeof(Int32));
-
+            table.Columns.Add("PACKNO1", typeof(Int32));
             return table;
         }
 
