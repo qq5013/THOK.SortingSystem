@@ -278,7 +278,7 @@ namespace THOK.AS.Dao
 
                     //°ü×´»úºÅ
                     " 1 EXPORTNO, 1 EXPORTNO1, '0', NULL ," +  
-                    " 0 PACKNO "+
+                    " 0 PACKNO ,0 PACKNO1"+
           
                     " FROM AS_I_ORDERMASTER A " +
                     " LEFT JOIN AS_SC_LINE B ON A.ROUTECODE = B.ROUTECODE  AND A.ORDERDATE = B.ORDERDATE AND A.BATCHNO = B.BATCHNO " +

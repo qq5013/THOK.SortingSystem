@@ -32,6 +32,8 @@ namespace THOK.Optimize
             public int exportNo = 1;
             public int quantity = 0;
             public int splitPackQuantity = 0;
+            public int lastOrderNo = 0;
+            public int lastOrderNo1 = 0;
         }
         private PackerInfo packerInfo = new PackerInfo();
 
@@ -533,6 +535,24 @@ namespace THOK.Optimize
                 AddMasterRow(masterTable, masterRow, sortNo++, orderNo++, quantity,exportNoLast);
             }
 
+            DataRow[] orderMasterRows = masterTable.Select(string.Format("QUANTITY <= {0} AND ORDERNO = {1}", splitOrderQuantity, packerInfo.lastOrderNo));
+            foreach (DataRow orderMasterRow in orderMasterRows)
+            {
+                orderMasterRow["PACKNO"] = packerInfo.packNo;
+            }
+
+            orderMasterRows = masterTable.Select(string.Format("QUANTITY1 <= {0} AND ORDERNO = {2}", splitOrderQuantity,packerInfo.lastOrderNo1));
+            foreach (DataRow orderMasterRow in orderMasterRows)
+            {
+                orderMasterRow["PACKNO1"] = packerInfo.packNo;
+            }
+
+            DataRow[] orderRows = detailTable.Select(string.Format("(CHANNELGROUP = 1 AND ORDERNO = {0}) OR (CHANNELGROUP = 2 AND ORDERNO = {1})", packerInfo.lastOrderNo, packerInfo.lastOrderNo1));
+            foreach (DataRow orderRow in orderRows)
+            {
+                orderRow["PACKNO"] = packerInfo.packNo;
+            }
+
             DataSet ds = new DataSet();
             ds.Tables.Add(masterTable);
             ds.Tables.Add(detailTable);
@@ -581,6 +601,8 @@ namespace THOK.Optimize
                 if (packerInfo.orderId != masterRow["ORDERID"].ToString())
                 {
                     packerInfo.packNo++;
+                    packerInfo.lastOrderNo = 0;
+                    packerInfo.lastOrderNo1 = 0;
                     packerInfo.orderId = masterRow["ORDERID"].ToString();
                 }
 
@@ -594,14 +616,24 @@ namespace THOK.Optimize
                 }
             }
             if (groupQuantity[channelGroup - 1] > 0)
-            {              
-                masterRow["PACKNO"] = packNo;
+            {          
                 if (channelGroup == 1)
                 {
                     masterRow["EXPORTNO"] = exportNo;
-                }else
+                    masterRow["PACKNO"] = packNo;
+                    if (groupQuantity[channelGroup - 1] <= splitOrderQuantity)
+                    {
+                        packerInfo.lastOrderNo = orderNo;
+                    }
+                }
+                else
                 {
                     masterRow["EXPORTNO1"] = exportNo;
+                    masterRow["PACKNO1"] = packNo;
+                    if (groupQuantity[channelGroup - 1] <= splitOrderQuantity)
+                    {
+                        packerInfo.lastOrderNo1 = orderNo;
+                    }
                 }
 
                 DataRow[] orderRows = tmpTable.Select(string.Format("CHANNELGROUP={0} AND QUANTITY > 0", channelGroup),string.Format("CHANNELTYPE {0},QUANTITY DESC,CHANNELORDER DESC",sort));
@@ -672,6 +704,7 @@ namespace THOK.Optimize
             table.Columns.Add("EXPORTNO", typeof(Int32));
             table.Columns.Add("EXPORTNO1", typeof(Int32));
             table.Columns.Add("PACKNO", typeof(Int32));
+            table.Columns.Add("PACKNO1", typeof(Int32));
             return table;
         }
 
@@ -733,6 +766,7 @@ namespace THOK.Optimize
             newRow["EXPORTNO"] = masterRow["EXPORTNO"];
             newRow["EXPORTNO1"] = masterRow["EXPORTNO1"];
             newRow["PACKNO"] = masterRow["PACKNO"];
+            newRow["PACKNO1"] = masterRow["PACKNO1"];
 
             masterTable.Rows.Add(newRow);
         }
@@ -765,6 +799,8 @@ namespace THOK.Optimize
                 newRow["CHANNELTYPE"] = channelRow["CHANNELTYPE"];
                 if (sortNo != -1)
                     newRow["EXPORTNO"] = channelRow["EXPORTNO"];
+                if (sortNo != -1)
+                    newRow["PACKNO"] = channelRow["PACKNO"];
 
                 detailTable.Rows.Add(newRow);
             }

@@ -187,6 +187,7 @@ namespace THOK.AS.Dao
                 sql.Append("EXPORTNO", orderRow["EXPORTNO"]);
                 sql.Append("EXPORTNO1", orderRow["EXPORTNO1"]);
                 sql.AppendQuote("PACKNO", orderRow["PACKNO"]);
+                sql.AppendQuote("PACKNO1", orderRow["PACKNO1"]);
 
                 ExecuteNonQuery(sql.GetSQL());
             }
