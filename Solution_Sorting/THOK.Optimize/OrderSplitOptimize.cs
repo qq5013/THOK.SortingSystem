@@ -541,7 +541,7 @@ namespace THOK.Optimize
                 orderMasterRow["PACKNO"] = packerInfo.packNo;
             }
 
-            orderMasterRows = masterTable.Select(string.Format("QUANTITY1 <= {0} AND ORDERNO = {2}", splitOrderQuantity,packerInfo.lastOrderNo1));
+            orderMasterRows = masterTable.Select(string.Format("QUANTITY1 <= {0} AND ORDERNO = {1}", splitOrderQuantity,packerInfo.lastOrderNo1));
             foreach (DataRow orderMasterRow in orderMasterRows)
             {
                 orderMasterRow["PACKNO1"] = packerInfo.packNo;
