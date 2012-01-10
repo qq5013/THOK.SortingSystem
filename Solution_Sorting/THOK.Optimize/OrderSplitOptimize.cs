@@ -24,7 +24,7 @@ namespace THOK.Optimize
 
         public class PackerInfo
         {
-            public int packMode = 0; //(0：正常PE包装；1：周转箱连续客户合装包装)
+            public int packMode = 0; //(0：正常PE包装；1：周转箱连续客户合装包装；2：动态包装)
             public string lineCode = "";
             public string routeCode = "";
             public string orderId = "";
