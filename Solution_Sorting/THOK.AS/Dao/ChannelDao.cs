@@ -55,11 +55,12 @@ namespace THOK.AS.Dao
         /// <param name="orderDate"></param>
         /// <param name="batchNo"></param>
         /// <param name="lineCode"></param>
-        /// <returns></returns>
-        public DataSet FindChannelSchedule(string orderDate, int batchNo, string lineCode)
+        /// <returns></returns>22
+        public DataSet FindChannelSchedule(string orderDate, int batchNo, string lineCode,int remainCount)
         {
             string sql = "SELECT *, 50 REMAINQUANTITY,CASE WHEN CHANNELTYPE='3' THEN QUANTITY / 50 - 3 ELSE QUANTITY / 50 - 1 END PIECE " +
                 "FROM AS_SC_CHANNELUSED WHERE LINECODE = '{0}' AND BATCHNO = '{1}' AND ORDERDATE = '{2}' ORDER BY CHANNELORDER";
+
             sql = "SELECT A.*,D.CIGARETTECODE  AS D_CIGARETTECODE,"+
                     " 	CASE WHEN (A.QUANTITY + ISNULL(B.QUANTITY,0))%50 > 16 " +
                     " 		    THEN (A.QUANTITY + ISNULL(B.QUANTITY,0))%50 - 16" +
@@ -70,10 +71,10 @@ namespace THOK.AS.Dao
                     " 	CASE WHEN A.CHANNELTYPE='3' " +
                     " 		THEN " +
                     " 	        CASE WHEN (A.QUANTITY + ISNULL(B.QUANTITY,0))%50 > 16 " +
-                    " 		            THEN (A.QUANTITY + ISNULL(B.QUANTITY,0))/ 50 - 3 " +
+                    " 		            THEN (A.QUANTITY + ISNULL(B.QUANTITY,0))/ 50 - {3} " +
                     "               WHEN (ISNULL(C.QUANTITY,0) - ISNULL(B.QUANTITY,0)) > 16 " +
-                    " 		            THEN (A.QUANTITY + ISNULL(B.QUANTITY,0))/ 50 - 3 " +
-                    " 		        ELSE (A.QUANTITY + ISNULL(B.QUANTITY,0))/ 50 - 4 " +
+                    " 		            THEN (A.QUANTITY + ISNULL(B.QUANTITY,0))/ 50 - {3} " +
+                    " 		        ELSE (A.QUANTITY + ISNULL(B.QUANTITY,0))/ 50 - ({3} + 1 ) " +
                     " 	        END " +
                     " 		ELSE (A.QUANTITY + ISNULL(B.QUANTITY,0))/ 50 - 1 " +
                     " 	END PIECE, " +
@@ -100,7 +101,7 @@ namespace THOK.AS.Dao
                     " AND A.BATCHNO = '{1}' " +
                     " AND A.ORDERDATE = '{2}' " +
                     " ORDER BY A.CHANNELORDER";
-            return ExecuteQuery(string.Format(sql, lineCode, batchNo, orderDate));
+            return ExecuteQuery(string.Format(sql, lineCode, batchNo, orderDate,remainCount));
         }
 
         /// <summary>

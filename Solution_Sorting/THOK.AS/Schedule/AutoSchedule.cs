@@ -396,7 +396,7 @@ namespace THOK.AS.Schedule
                     string lineCode = lineRow["LINECODE"].ToString();
 
                     //查询烟道信息表
-                    DataTable channelTable = channelDao.FindChannelSchedule(orderDate, batchNo, lineCode).Tables[0];
+                    DataTable channelTable = channelDao.FindChannelSchedule(orderDate, batchNo, lineCode, Convert.ToInt32(parameter["RemainCount"])).Tables[0];
                     //查询订单主表
                     DataTable masterTable = orderDao.FindOrderMaster(orderDate, batchNo, lineCode).Tables[0];                    
                     //查询订单明细表
@@ -445,6 +445,9 @@ namespace THOK.AS.Schedule
                 SupplyDao supplyDao = new SupplyDao();
                 OrderOptimize orderSchedule = new OrderOptimize();
 
+                SysParameterDao parameterDao = new SysParameterDao();
+                Dictionary<string, string> parameter = parameterDao.FindParameters();
+
                 LineScheduleDao lineDao = new LineScheduleDao();
                 DataTable lineTable = lineDao.FindAllLine(orderDate, batchNo).Tables[0];
 
@@ -457,7 +460,7 @@ namespace THOK.AS.Schedule
                     //查询订单明细表
                     DataTable orderTable = orderDao.FindTmpDetail(orderDate, batchNo, lineCode);
                     //查询分拣烟道表
-                    DataTable channelTable = channelDao.FindChannelSchedule(orderDate, batchNo, lineCode).Tables[0];
+                    DataTable channelTable = channelDao.FindChannelSchedule(orderDate, batchNo, lineCode, Convert.ToInt32(parameter["RemainCount"])).Tables[0];
 
                     int sortNo = 1;
                     int currentCount = 0;
@@ -489,7 +492,7 @@ namespace THOK.AS.Schedule
                     string lineCode = lineRow["LINECODE"].ToString();
 
                     //查询烟道信息表
-                    DataTable channelTable = channelDao.FindChannelSchedule(orderDate, batchNo, lineCode).Tables[0];
+                    DataTable channelTable = channelDao.FindChannelSchedule(orderDate, batchNo, lineCode, Convert.ToInt32(parameter["RemainCount"])).Tables[0];
                     //查询订单主表
                     DataTable masterTable = orderDao.FindOrderMaster(orderDate, batchNo, lineCode).Tables[0];
                     //查询订单明细表
@@ -606,7 +609,7 @@ namespace THOK.AS.Schedule
                     aheadCount = Convert.ToInt32(parameter[string.Format("SupplyAheadCount-{0}-{1}-{2}", lineCode, channelGroup, channelType)]);      
                     supplyDao.AdjustSortNo(orderDate, batchNo, lineCode, channelGroup, channelType, aheadCount);
 
-                    DataTable channelTable = channelDao.FindChannelSchedule(orderDate, batchNo, lineCode).Tables[0];
+                    DataTable channelTable = channelDao.FindChannelSchedule(orderDate, batchNo, lineCode, Convert.ToInt32(parameter["RemainCount"])).Tables[0];
                     DataTable supplyTable = supplyOptimize.Optimize(channelTable);
                     supplyDao.InsertSupply(supplyTable,false);
 
@@ -622,7 +625,7 @@ namespace THOK.AS.Schedule
                     string lineCode = lineRow["LINECODE"].ToString();
 
                     //查询烟道信息表
-                    DataTable channelTable = channelDao.FindChannelSchedule(orderDate, batchNo, lineCode).Tables[0];
+                    DataTable channelTable = channelDao.FindChannelSchedule(orderDate, batchNo, lineCode, Convert.ToInt32(parameter["RemainCount"])).Tables[0];
                     //查询订单主表
                     DataTable masterTable = orderDao.FindOrderMaster(orderDate, batchNo, lineCode).Tables[0];
                     //查询订单明细表
