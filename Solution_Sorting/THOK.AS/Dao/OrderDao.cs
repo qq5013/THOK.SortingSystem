@@ -254,7 +254,7 @@ namespace THOK.AS.Dao
 
             sql = "SELECT A.ORDERDATE,A.BATCHNO, B.LINECODE, " + 
                     //分拣流水号
-                    " ROW_NUMBER() over (ORDER BY C.SORTID,D.SORTID,A.ROUTECODE, E.SORTID) SORTNO, " +
+                    " ROW_NUMBER() over (ORDER BY C.SORTID,D.SORTID,A.ROUTECODE, A.SORTID) SORTNO, " +
 
                     " A.ORDERID, A.AREACODE, C.AREANAME, A.ROUTECODE, D.ROUTENAME, A.CUSTOMERCODE, E.CUSTOMERNAME,E.ADDRESS, E.LICENSENO, " +
                     " 0 TQUANTITY, 0 QUANTITY, 0 PQUANTITY, 0 PACKQUANTITY, " + 
@@ -269,12 +269,12 @@ namespace THOK.AS.Dao
                     //" E.SORTID ORDERNO, " + 
 
                     //分拣订单在当前分拣线路中的分拣序号（根据业务配送序号分拣生成的连续顺序号）
-                    " (SELECT ORDERNO FROM (SELECT A1.*,ROW_NUMBER() over (ORDER BY B1.SORTID) ORDERNO FROM AS_I_ORDERMASTER A1 " +
+                    " (SELECT ORDERNO FROM (SELECT A1.*,ROW_NUMBER() over (ORDER BY A1.SORTID) ORDERNO FROM AS_I_ORDERMASTER A1 " +
                         " LEFT JOIN AS_BI_CUSTOMER B1 ON A1.CUSTOMERCODE = B1.CUSTOMERCODE "+
                         " WHERE A1.ROUTECODE = A.ROUTECODE AND A1.ORDERDATE = '{0}' AND A1.BATCHNO = '{1}') TEMP WHERE TEMP.ORDERID = A.ORDERID) ORDERNO," +
 
                     //分拣订单在全部订单中的分拣序号（根据业务配送序号分拣生成的连续顺序号）
-                    " ROW_NUMBER() over (ORDER BY  C.SORTID,D.SORTID,A.ROUTECODE, E.SORTID) CUSTOMERSORTNO," +
+                    " ROW_NUMBER() over (ORDER BY  C.SORTID,D.SORTID,A.ROUTECODE, A.SORTID) CUSTOMERSORTNO," +
 
                     //包状机号
                     " 1 EXPORTNO, 1 EXPORTNO1, '0', NULL" +  
