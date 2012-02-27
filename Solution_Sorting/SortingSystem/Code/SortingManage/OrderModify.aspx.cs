@@ -117,7 +117,7 @@ public partial class Code_Query_OrderQuery : BasePage
     protected void gvDetail_RowEditing(object sender, GridViewEditEventArgs e)
     {
         gvDetail.EditIndex = e.NewEditIndex;
-        BindDetailData();
+        //BindDetailData();
         cigaretteCode=gvDetail.Rows[e.NewEditIndex].Cells[1].Text.Trim();
         cigaretteName=gvDetail.Rows[e.NewEditIndex].Cells[2].Text.Trim();
     }
@@ -138,7 +138,7 @@ public partial class Code_Query_OrderQuery : BasePage
             lblTip.Text = "";
             lblTip.Text = lblTip.Text + "将订单号为：'"+orderId+"'卷烟名称为：'"+cigaretteName+"'的分拣数量修改为：'"+quantity+"'是否保存？";
         }
-        BindDetailData();
+        //BindDetailData();
     }
     protected void btnNo_Click(object sender, EventArgs e)
     {
