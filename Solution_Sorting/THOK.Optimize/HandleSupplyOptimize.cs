@@ -208,6 +208,7 @@ namespace THOK.Optimize
 
                 row["QUANTITY"] = order["QUANTITY"];
                 row["EXPORTNO"] = order["EXPORTNO"];
+                row["PACKNO"] = order["PACKNO"];
 
                 scOrderTable.Rows.Add(row);
             }

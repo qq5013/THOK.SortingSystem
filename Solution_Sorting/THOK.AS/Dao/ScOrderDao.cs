@@ -55,6 +55,7 @@ namespace THOK.AS.Dao
 
                 sqlCreate.Append("QUANTITY", dataRow["QUANTITY"]);
                 sqlCreate.Append("EXPORTNO", dataRow["EXPORTNO"]);
+                sqlCreate.Append("PACKNO", dataRow["PACKNO"]);
 
                 ExecuteNonQuery(sqlCreate.GetSQL());
             }
