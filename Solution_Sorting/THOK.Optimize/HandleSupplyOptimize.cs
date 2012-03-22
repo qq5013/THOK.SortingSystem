@@ -181,6 +181,7 @@ namespace THOK.Optimize
 
             table.Columns.Add("QUANTITY", typeof(Int32));
             table.Columns.Add("EXPORTNO", typeof(Int32));
+            table.Columns.Add("PACKNO", typeof(Int32));
             return table;
         }
 
