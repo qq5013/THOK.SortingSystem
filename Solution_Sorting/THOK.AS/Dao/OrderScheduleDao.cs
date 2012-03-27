@@ -361,7 +361,7 @@ namespace THOK.AS.Dao
         }
 
         //整件分拣打码
-        internal DataTable FindOrderForWholePieces(string orderDate, int batchNo, string wholePiecesSortLineCode)
+        internal DataTable FindOrderForWholePieces(string orderDate, int batchNo, string wholePiecesSortLineCode, string wholePiecesSortMode)
         {
             //
             //string sql = "SELECT ROW_NUMBER() OVER (ORDER BY D.SORTID,C.SORTID,A.ORDERID ,B.CIGARETTECODE) AS SORTNO, " +
@@ -388,7 +388,11 @@ namespace THOK.AS.Dao
             //                " ORDER BY LINECODE,SORTNO,CIGARETTECODE";
             //return ExecuteQuery(string.Format(sql, wholePiecesSortLineCode, orderDate, batchNo)).Tables[0];
 
-            string sql = @"SELECT A.SORTNO SORTNO,
+            string sql = "";
+            if (wholePiecesSortMode == "0")
+            {
+                //按订单打
+                sql = @"SELECT A.SORTNO SORTNO,
 	                        A.SORTNO ORDERID,D.N_CUST_CODE,A.CUSTOMERNAME,B.CIGARETTECODE,B.CIGARETTENAME,
 	                        SUM(B.QUANTITY) QUANTITY,   
 	                        ISNULL(Z.BATCHNO_ONEPRO,Z.BATCHNO) BATCHNO,  
@@ -406,6 +410,29 @@ namespace THOK.AS.Dao
 	                        WHERE A.ORDERDATE='{0}' AND A.BATCHNO='{1}' AND C.LINETYPE = '3'  
 	                        GROUP BY A.ORDERDATE,Z.BATCHNO_ONEPRO,Z.BATCHNO,A.LINECODE,A.ROUTECODE,A.ROUTENAME,A.ORDERID,A.CUSTOMERCODE,D.N_CUST_CODE,A.CUSTOMERNAME,A.SORTNO,B.CIGARETTECODE,B.CIGARETTENAME
 	                        ORDER BY A.LINECODE,SORTNO,B.CIGARETTECODE ";
+            }
+            else if(wholePiecesSortMode=="1")
+            {
+                //按品牌打
+                sql = @"SELECT ROW_NUMBER() OVER (ORDER BY B.CIGARETTECODE,A.ROUTECODE,A.CUSTOMERCODE) AS SORTNO,
+                                ROW_NUMBER() OVER (ORDER BY CIGARETTECODE) AS ORDERID,D.N_CUST_CODE,A.CUSTOMERNAME,B.CIGARETTECODE,B.CIGARETTENAME,
+                                SUM(B.QUANTITY) QUANTITY,
+                                ISNULL(Z.BATCHNO_ONEPRO,Z.BATCHNO) BATCHNO,
+                                ROW_NUMBER() OVER (ORDER BY CIGARETTECODE) AS ORDERNO,
+                                A.ROUTECODE,A.ROUTENAME,
+                                CONVERT(NVARCHAR(10),A.ORDERDATE,120) ORDERDATE,
+                                CONVERT(NVARCHAR(10),GETDATE(),120) SCDATE,
+                                (SELECT NO1LINECODE FROM AS_BI_LINEINFO WHERE LINECODE = A.LINECODE) LINECODE ,
+                                '0' AS ZZBS
+                                FROM AS_SC_PALLETMASTER A
+                                LEFT JOIN AS_SC_ORDER B ON A.ORDERDATE = B.ORDERDATE AND A.BATCHNO = B.BATCHNO AND A.LINECODE=B.LINECODE AND A.SORTNO=B.SORTNO
+                                LEFT JOIN AS_BI_BATCH Z ON A.ORDERDATE = Z.ORDERDATE AND A.BATCHNO = Z.BATCHNO
+                                LEFT JOIN AS_BI_LINEINFO C ON A.LINECODE = C.LINECODE
+                                LEFT JOIN AS_BI_CUSTOMER D ON A.CUSTOMERCODE = D.CUSTOMERCODE
+                                WHERE A.ORDERDATE='{0}' AND A.BATCHNO='{1}' AND C.LINETYPE = '3'
+                                GROUP BY A.ORDERDATE,Z.BATCHNO_ONEPRO,Z.BATCHNO,A.LINECODE,A.ROUTECODE,A.ROUTENAME,A.ORDERID,A.CUSTOMERCODE,D.N_CUST_CODE,A.CUSTOMERNAME,A.SORTNO,B.CIGARETTECODE,B.CIGARETTENAME
+                                ORDER BY B.CIGARETTECODE,SORTNO,A.ROUTECODE,A.CUSTOMERCODE";
+            }
             return ExecuteQuery(string.Format(sql, orderDate, batchNo)).Tables[0];
         }
 

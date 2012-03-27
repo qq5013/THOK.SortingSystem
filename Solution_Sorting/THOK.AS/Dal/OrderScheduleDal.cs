@@ -89,6 +89,7 @@ namespace THOK.AS.Dal
                 string handleSortLineCode = parameter["handleSortLineCode"].ToString();                
                 string wholePiecesSortLineCode = parameter["WholePiecesSortLineCode"].ToString();
                 string abnormitySortLineCode = parameter["AbnormitySortLineCode"].ToString();
+                string wholePiecesSortMode = parameter["WholePiecesSortMode"].ToString();
 
                 switch (mode)
                 {
@@ -103,7 +104,7 @@ namespace THOK.AS.Dal
                         break;
                     case 3://整件分拣打码
                         if (wholePiecesSortLineCode != string.Empty)
-                            return orderDao.FindOrderForWholePieces(orderDate, batchNo, wholePiecesSortLineCode);
+                            return orderDao.FindOrderForWholePieces(orderDate, batchNo, wholePiecesSortLineCode,wholePiecesSortMode);
                         else
                             return new DataTable();                  
                         break;
