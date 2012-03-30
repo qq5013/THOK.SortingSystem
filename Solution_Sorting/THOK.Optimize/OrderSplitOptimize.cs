@@ -535,13 +535,13 @@ namespace THOK.Optimize
                 AddMasterRow(masterTable, masterRow, sortNo++, orderNo++, quantity,exportNoLast);
             }
 
-            DataRow[] orderMasterRows = masterTable.Select(string.Format("QUANTITY <= {0} AND ORDERNO = {1}", splitOrderQuantity, packerInfo.lastOrderNo));
+            DataRow[] orderMasterRows = masterTable.Select(string.Format("QUANTITY <= {0} AND PACKORDERNO = {1}", splitOrderQuantity, packerInfo.lastOrderNo));
             foreach (DataRow orderMasterRow in orderMasterRows)
             {
                 orderMasterRow["PACKNO"] = packerInfo.packNo;
             }
 
-            orderMasterRows = masterTable.Select(string.Format("QUANTITY1 <= {0} AND ORDERNO = {1}", splitOrderQuantity,packerInfo.lastOrderNo1));
+            orderMasterRows = masterTable.Select(string.Format("QUANTITY1 <= {0} AND PACKORDERNO = {1}", splitOrderQuantity, packerInfo.lastOrderNo1));
             foreach (DataRow orderMasterRow in orderMasterRows)
             {
                 orderMasterRow["PACKNO1"] = packerInfo.packNo;
@@ -767,6 +767,7 @@ namespace THOK.Optimize
             newRow["EXPORTNO1"] = masterRow["EXPORTNO1"];
             newRow["PACKNO"] = masterRow["PACKNO"];
             newRow["PACKNO1"] = masterRow["PACKNO1"];
+            newRow["PACKORDERNO"] = masterRow["PACKORDERNO"];
 
             masterTable.Rows.Add(newRow);
         }
