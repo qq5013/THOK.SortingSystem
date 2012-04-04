@@ -25,15 +25,15 @@ namespace THOK.Optimize
         public class PackerInfo
         {
             public int packMode = 0; //(0：正常PE包装；1：周转箱连续客户合装包装；2：动态包装)
-            public string lineCode = "";
-            public string routeCode = "";
-            public string orderId = "";
-            public int packNo = 0;
-            public int exportNo = 1;
-            public int quantity = 0;
-            public int splitPackQuantity = 0;
-            public int lastOrderNo = 0;
-            public int lastOrderNo1 = 0;
+            public string lineCode = "";//当前折单优化分拣线
+            public string routeCode = "";//当前折单优化线路
+            public string orderId = "";//当前折单优化订单号
+            public int packNo = 0;//当前折单优化包装包号
+            public int exportNo = 1;//当前折单优化包装机方向（1：1号包装机；2：2号包装机；）
+            public int quantity = 0;//当前折单优化包装数量
+            public int splitPackQuantity = 0; //包装折包的每包数量
+            public int lastOrderNo = 0;//A线尾数单的OrderNo
+            public int lastOrderNo1 = 0;//B线尾数单的OrderNo
         }
         private PackerInfo packerInfo = new PackerInfo();
 
@@ -228,11 +228,13 @@ namespace THOK.Optimize
         {
             DataRow[] channelRows = channelTable.Select(string.Format("STATUS = '1' AND CIGARETTECODE = '{0}'", cigaretteCode));
 
+            //判断是否为固定烟道，如果是则不可移；
             if (channelRows[0]["CIGARETTECODE"].ToString() == channelRows[0]["D_CIGARETTECODE"].ToString() )
             {
                 return false;
             }
 
+            //判断是否为通道机，且已进入尾数折单优化，如果是则进入移仓算法；
             if (channelRows[0]["CHANNELTYPE"].ToString() == "3" && Convert.ToInt32(channelRows[0]["QUANTITY"]) + quantity > Convert.ToInt32(channelRows[0]["GROUPNO"]) / 50 * 50)
             {
                 int quantity1 = Convert.ToInt32(channelRows[0]["GROUPNO"]) / 50 * 50 - Convert.ToInt32(channelRows[0]["QUANTITY"]);
@@ -261,6 +263,7 @@ namespace THOK.Optimize
                     {
                         if (channelRows1.Length > 0)
                         {
+                            //移仓到立式空仓烟道
                             channelRows1[0]["CIGARETTECODE"] = cigaretteCode;
                             channelRows1[0]["CIGARETTENAME"] = channelRows[0]["CIGARETTENAME"];
                             channelRows1[0]["GROUPNO"] = channelRows[0]["GROUPNO"];
@@ -271,11 +274,28 @@ namespace THOK.Optimize
                         }
                         else
                         {
+                            int channelQuantityTotal = Convert.ToInt32(channelTable.Compute("SUM(QUANTITY)", string.Format("STATUS = '1' AND CIGARETTECODE='{0}'", cigaretteCode)));
+                            bool isLastNoMove = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - quantity2 <= 17;
+                            if (isLastNoMove)
+                            {
+                                int q1 = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - 17;
+                                q1 = (q1 > 0 ? q1 : 0);//可移仓到混合烟道的数量
+                                int q2 = quantity2 - q1;//不移仓数量
+                                if (q2 > 0)
+                                {
+                                    AddDetailRow(masterRow, detailTable, -1, lineCode, channelRows[0], q2);
+                                    channelGroup = Convert.ToInt32(channelRows[0]["CHANNELGROUP"]);
+                                    groupQuantity[channelGroup - 1] += q2;
+                                    quantity2 -= q2;
+                                }
+                            }
+
+                            //移仓到混合烟道
                             if (!moveToMixChannelProducts.Contains(cigaretteCode))
                             {
                                 moveToMixChannelProducts.Add(cigaretteCode);
                             }
-                            
+
                             channelRows2[0]["CIGARETTECODE"] = cigaretteCode;
                             channelRows2[0]["CIGARETTENAME"] = channelRows[0]["CIGARETTENAME"];
                             AddDetailRow(masterRow, detailTable, -1, lineCode, channelRows2[0], quantity2);
@@ -284,6 +304,7 @@ namespace THOK.Optimize
 
                             channelGroup = Convert.ToInt32(channelRows2[0]["CHANNELGROUP"]);
                             groupQuantity[channelGroup - 1] += quantity2;
+
                         }
                     }
                 }
@@ -302,6 +323,7 @@ namespace THOK.Optimize
         {
             //++q
             DataRow[] channelRows = channelTable.Select(string.Format("STATUS = '1' AND CIGARETTECODE = '{0}'", cigaretteCode), "CHANNELTYPE,QUANTITY");
+            //判断是否为固定烟道，如果是则不可移；
             if (channelRows[0]["CIGARETTECODE"].ToString() == channelRows[0]["D_CIGARETTECODE"].ToString())
             {
                 return false;
@@ -311,6 +333,7 @@ namespace THOK.Optimize
             int OrderQuantityTotal = quantity;
             if (channelQuantityTotal + OrderQuantityTotal > Convert.ToInt32(channelRows[0]["GROUPNO"]) / 50 * 50 - 50 * channelRows.Length)
             {
+                //循环将非整烟道补整；
                 foreach (DataRow row in channelRows)
                 {
                     if (Convert.ToInt32(row["QUANTITY"]) % 50 != 0 && OrderQuantityTotal > 0)
@@ -326,8 +349,9 @@ namespace THOK.Optimize
                 }
 
                 channelQuantityTotal = Convert.ToInt32(channelTable.Compute("SUM(QUANTITY)", string.Format("STATUS = '1' AND CIGARETTECODE='{0}'", cigaretteCode)));
-                while(OrderQuantityTotal > 0 && Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal >= 50)
-                {                    
+                //循环将非整烟道补整；
+                while (OrderQuantityTotal > 0 && Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal >= 50)
+                {
                     int temp1 = OrderQuantityTotal > 50 ? 50 : OrderQuantityTotal;
                     AddDetailRow(masterRow, detailTable, -1, lineCode, channelRows[0], temp1);
                     OrderQuantityTotal -= temp1;
@@ -338,21 +362,39 @@ namespace THOK.Optimize
                     channelQuantityTotal = Convert.ToInt32(channelTable.Compute("SUM(QUANTITY)", string.Format("STATUS = '1' AND CIGARETTECODE='{0}'", cigaretteCode)));
                 }
 
+                //移仓到立式空仓烟道
                 DataRow[] channelRows1 = channelTable.Select(string.Format("STATUS = '1' AND CIGARETTECODE = '' AND CHANNELTYPE = '{0}'", "2"));
                 if (OrderQuantityTotal > 0 && channelRows1.Length > 0 && channelRows[0]["CHANNELTYPE"].ToString() == "3")
                 {
                     channelRows1[0]["CIGARETTECODE"] = cigaretteCode;
                     channelRows1[0]["CIGARETTENAME"] = channelRows[0]["CIGARETTENAME"];
                     channelRows1[0]["GROUPNO"] = channelRows[0]["GROUPNO"];
-                    AddDetailRow(masterRow, detailTable, -1, lineCode, channelRows1[0], OrderQuantityTotal);                    
+                    AddDetailRow(masterRow, detailTable, -1, lineCode, channelRows1[0], OrderQuantityTotal);
 
                     int channelGroup2 = Convert.ToInt32(channelRows1[0]["CHANNELGROUP"]);
                     groupQuantity[channelGroup2 - 1] += OrderQuantityTotal;
                     OrderQuantityTotal = 0;
                 }
 
+                //移仓到混合烟道(部份不移仓)
                 DataRow[] channelRows2 = channelTable.Select(string.Format("STATUS = '1' AND CHANNELTYPE = '{0}'", "5"));
-                if (OrderQuantityTotal > 0 && isTwoChannelMoveToMixChannel && channelRows[0]["CHANNELTYPE"].ToString() == "3" && channelRows2.Length > 0 && ( moveToMixChannelProducts.Contains(cigaretteCode) || moveToMixChannelProducts.Count < moveToMixChannelProductsCount))
+                bool isLastNoMove = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - OrderQuantityTotal <= 17;
+                if (isLastNoMove)
+                {
+                    int q1 = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - 17;
+                    q1 = (q1 > 0 ? q1 : 0);//可移仓到混合烟道的数量
+                    int q2 = OrderQuantityTotal - q1;//不移仓数量
+                    if (q2 > 0)
+                    {
+                        AddDetailRow(masterRow, detailTable, -1, lineCode, channelRows[0], q2);
+
+                        int channelGroup2 = Convert.ToInt32(channelRows[0]["CHANNELGROUP"]);
+                        groupQuantity[channelGroup2 - 1] += q2;
+                        OrderQuantityTotal -= q2;
+                    }
+                }
+                //移仓到混合烟道
+                if (OrderQuantityTotal > 0 && isTwoChannelMoveToMixChannel && channelRows[0]["CHANNELTYPE"].ToString() == "3" && channelRows2.Length > 0 && (moveToMixChannelProducts.Contains(cigaretteCode) || moveToMixChannelProducts.Count < moveToMixChannelProductsCount))
                 {
                     if (!moveToMixChannelProducts.Contains(cigaretteCode))
                     {
@@ -370,10 +412,12 @@ namespace THOK.Optimize
                 }
                 else if (OrderQuantityTotal > 0)
                 {
+                    //不移仓
                     AddDetailRow(masterRow, detailTable, -1, lineCode, channelRows[0], OrderQuantityTotal);
-                  
+
                     int channelGroup2 = Convert.ToInt32(channelRows[0]["CHANNELGROUP"]);
                     groupQuantity[channelGroup2 - 1] += OrderQuantityTotal;
+                    OrderQuantityTotal = 0;
                 }
 
                 return true;
@@ -635,6 +679,8 @@ namespace THOK.Optimize
                         packerInfo.lastOrderNo1 = orderNo;
                     }
                 }
+
+                masterRow["PACKORDERNO"] = orderNo;
 
                 DataRow[] orderRows = tmpTable.Select(string.Format("CHANNELGROUP={0} AND QUANTITY > 0", channelGroup),string.Format("CHANNELTYPE {0},QUANTITY DESC,CHANNELORDER DESC",sort));
                 foreach (DataRow orderRow in orderRows)
