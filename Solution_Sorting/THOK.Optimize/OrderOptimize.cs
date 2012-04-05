@@ -261,8 +261,8 @@ namespace THOK.Optimize
                     sortNo++;
                 AddDetail(masterRow, channelRow, detailTable, sortNo, orderQuantity[i],orderNo,exportNo,packNo);
 
-                //记录分拣倒数第3条的订单号
-                if (tmpQuantity >= 8 && tmpQuantity - orderQuantity[i] <= 8)
+                //记录分拣倒数第3条的订单号 todo;
+                if (tmpQuantity >= 7 && tmpQuantity - orderQuantity[i] < 7)
                     channelRow["SORTNO"] = sortNo;
                 tmpQuantity -= orderQuantity[i];
 

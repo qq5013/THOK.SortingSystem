@@ -142,7 +142,7 @@ namespace THOK.Optimize
                 channelCount = 0;
                 foreach (DataRow scOrderRow in rows)
                 {
-                    //记录分拣倒数第7条的订单号
+                    //记录分拣倒数第7条的订单号 todo;
                     if (channelCount <= 7 && channelCount + Convert.ToInt32(scOrderRow["QUANTITY"]) >= 7)
                     {
                         channelRow["SORTNO"] = Convert.ToInt32(scOrderRow["SORTNO"]);
@@ -181,6 +181,7 @@ namespace THOK.Optimize
 
             table.Columns.Add("QUANTITY", typeof(Int32));
             table.Columns.Add("EXPORTNO", typeof(Int32));
+            table.Columns.Add("PACKNO", typeof(Int32));
             return table;
         }
 
