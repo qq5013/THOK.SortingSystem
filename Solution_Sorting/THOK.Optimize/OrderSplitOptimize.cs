@@ -15,10 +15,13 @@ namespace THOK.Optimize
         private int[] exportQuantity = new int[2];
         private int[] channelGroupQuantity = new int[2];
 
+        private int noMoveTixChannelQuantity = 0;
         private bool isOneChannelMoveToMixChannel = false;
         private bool isTwoChannelMoveToMixChannel = false;
         private int moveToMixChannelProductsCount = 0;
         public IList<string> moveToMixChannelProducts = new List<string>();
+
+        
         
         private bool isCombineOrder = false;
 
@@ -43,6 +46,7 @@ namespace THOK.Optimize
             double splitParam = Convert.ToDouble(param["SplitParam"]);
             splitOrderQuantity = Convert.ToInt32(param["SplitOrderQuantity"]);
 
+            noMoveTixChannelQuantity = Convert.ToInt32(param["NoMoveTixChannelQuantity"]);
             isOneChannelMoveToMixChannel = Convert.ToBoolean(param["IsOneChannelMoveToMixChannel-" + lineCode]);
             isTwoChannelMoveToMixChannel = Convert.ToBoolean(param["IsTwoChannelMoveToMixChannel-" + lineCode]);
             moveToMixChannelProductsCount = Convert.ToInt32(param["MoveToMixChannelProductsCount-" + lineCode]);
@@ -275,10 +279,10 @@ namespace THOK.Optimize
                         else
                         {
                             int channelQuantityTotal = Convert.ToInt32(channelTable.Compute("SUM(QUANTITY)", string.Format("STATUS = '1' AND CIGARETTECODE='{0}'", cigaretteCode)));
-                            bool isLastNoMove = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - quantity2 <= 17;
+                            bool isLastNoMove = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - quantity2 <= noMoveTixChannelQuantity;
                             if (isLastNoMove)
                             {
-                                int q1 = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - 17;
+                                int q1 = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - noMoveTixChannelQuantity;
                                 q1 = (q1 > 0 ? q1 : 0);//可移仓到混合烟道的数量
                                 int q2 = quantity2 - q1;//不移仓数量
                                 if (q2 > 0)
@@ -378,10 +382,10 @@ namespace THOK.Optimize
 
                 //移仓到混合烟道(部份不移仓)
                 DataRow[] channelRows2 = channelTable.Select(string.Format("STATUS = '1' AND CHANNELTYPE = '{0}'", "5"));
-                bool isLastNoMove = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - OrderQuantityTotal <= 17;
+                bool isLastNoMove = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - OrderQuantityTotal <= noMoveTixChannelQuantity;
                 if (isLastNoMove)
                 {
-                    int q1 = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - 17;
+                    int q1 = Convert.ToInt32(channelRows[0]["GROUPNO"]) - channelQuantityTotal - noMoveTixChannelQuantity;
                     q1 = (q1 > 0 ? q1 : 0);//可移仓到混合烟道的数量
                     int q2 = OrderQuantityTotal - q1;//不移仓数量
                     if (q2 > 0)
