@@ -467,28 +467,28 @@ namespace THOK.AS.Dao
                             " WHERE A.ORDERDATE='{1}' AND A.BATCHNO='{2}' AND B.QUANTITY IS NOT NULL AND E.ISABNORMITY = '1'" +
                             " ORDER BY LINECODE,SORTNO,CIGARETTECODE";
             //°´Æ·ÅÆ´ò
-            sql = @"SELECT ROW_NUMBER() OVER (ORDER BY B.CIGARETTECODE,D.SORTID,C.SORTID) AS SORTNO,   
-                      A.ORDERID,C.N_CUST_CODE,C.CUSTOMERNAME,  
-                      B.CIGARETTECODE,B.CIGARETTENAME,B.QUANTITY,   
-                      ISNULL(Z.BATCHNO_ONEPRO,Z.BATCHNO) BATCHNO,  
-                      ROW_NUMBER() OVER (ORDER BY D.SORTID,C.SORTID,A.ORDERID ,B.CIGARETTECODE) ORDERNO,  
-                      D.ROUTECODE,D.ROUTENAME,  
-                      CONVERT(NVARCHAR(10),A.ORDERDATE,120) ORDERDATE,  
-                      CONVERT(NVARCHAR(10),GETDATE(),120) SCDATE,  
-                      '{0}' AS LINECODE,'1' AS ZZBS    
-                      FROM AS_I_ORDERMASTER A   
-                      LEFT JOIN AS_I_ORDERDETAIL B   
-                      ON A.ORDERID = B.ORDERID   
-                      LEFT JOIN AS_BI_BATCH Z   
-                      ON A.ORDERDATE = Z.ORDERDATE AND A.BATCHNO = Z.BATCHNO   
-                      LEFT JOIN AS_BI_CUSTOMER C   
-                      ON A.CUSTOMERCODE = C.CUSTOMERCODE  
-                      LEFT JOIN AS_BI_ROUTE D  
-                      ON A.ROUTECODE = D.ROUTECODE   
-                      LEFT JOIN AS_BI_CIGARETTE E  
-                      ON B.CIGARETTECODE = E.CIGARETTECODE  
-                      WHERE A.ORDERDATE='{1}' AND A.BATCHNO='{2}' AND B.QUANTITY IS NOT NULL AND E.ISABNORMITY = '1'  
-                      ORDER BY SORTNO,CIGARETTECODE,LINECODE";
+//            sql = @"SELECT ROW_NUMBER() OVER (ORDER BY B.CIGARETTECODE,D.SORTID,C.SORTID) AS SORTNO,   
+//                      A.ORDERID,C.N_CUST_CODE,C.CUSTOMERNAME,  
+//                      B.CIGARETTECODE,B.CIGARETTENAME,B.QUANTITY,   
+//                      ISNULL(Z.BATCHNO_ONEPRO,Z.BATCHNO) BATCHNO,  
+//                      ROW_NUMBER() OVER (ORDER BY D.SORTID,C.SORTID,A.ORDERID ,B.CIGARETTECODE) ORDERNO,  
+//                      D.ROUTECODE,D.ROUTENAME,  
+//                      CONVERT(NVARCHAR(10),A.ORDERDATE,120) ORDERDATE,  
+//                      CONVERT(NVARCHAR(10),GETDATE(),120) SCDATE,  
+//                      '{0}' AS LINECODE,'1' AS ZZBS    
+//                      FROM AS_I_ORDERMASTER A   
+//                      LEFT JOIN AS_I_ORDERDETAIL B   
+//                      ON A.ORDERID = B.ORDERID   
+//                      LEFT JOIN AS_BI_BATCH Z   
+//                      ON A.ORDERDATE = Z.ORDERDATE AND A.BATCHNO = Z.BATCHNO   
+//                      LEFT JOIN AS_BI_CUSTOMER C   
+//                      ON A.CUSTOMERCODE = C.CUSTOMERCODE  
+//                      LEFT JOIN AS_BI_ROUTE D  
+//                      ON A.ROUTECODE = D.ROUTECODE   
+//                      LEFT JOIN AS_BI_CIGARETTE E  
+//                      ON B.CIGARETTECODE = E.CIGARETTECODE  
+//                      WHERE A.ORDERDATE='{1}' AND A.BATCHNO='{2}' AND B.QUANTITY IS NOT NULL AND E.ISABNORMITY = '1'  
+//                      ORDER BY SORTNO,CIGARETTECODE,LINECODE";
 
             return ExecuteQuery(string.Format(sql, abnormitySortLineCode, orderDate, batchNo)).Tables[0];
         }
