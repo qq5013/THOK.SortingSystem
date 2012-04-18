@@ -43,7 +43,7 @@ namespace THOK.AS.Schedule
             parameter = new Dal.ParameterDal().FindParameter();
             txtFile = "RetailerOrder" + System.DateTime.Now.ToString("yyyyMMddHHmmss");
             zipFile = parameter["NoOneProFilePath"] + txtFile + ".zip";
-            txtFile = txtFile + (IsAbnormity ? ".YXOrder" : ".Order");
+            txtFile = txtFile + (IsAbnormity ? ".Order" : ".Order");
             this.isAbnormity = IsAbnormity;
             try
             {
