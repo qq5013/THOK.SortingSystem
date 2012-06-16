@@ -543,7 +543,8 @@ namespace THOK.AS.Schedule
                 //查询立式机卷烟数量信息表（应加上混合烟道问题）
                 DataTable orderTTable = orderDao.FindCigaretteQuantityFromChannelUsed(orderDate, batchNo, "2");
                 //取所有订单品牌及总数量
-                DataTable orderTable = detailDao.FindAllCigaretteQuantity(orderDate, batchNo,false).Tables[0];
+                bool isUseWholePiecesSortLine = Convert.ToBoolean(parameter["isUseWholePiecesSortLine"]);
+                DataTable orderTable = detailDao.FindAllCigaretteQuantity(orderDate, batchNo,isUseWholePiecesSortLine).Tables[0];
 
                 StockOptimize stockOptimize = new StockOptimize();
 
