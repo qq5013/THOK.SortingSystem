@@ -78,7 +78,7 @@ namespace THOK.AS.Dal
             return count;
         }
 
-        public DataTable GetOrder(string orderDate, int batchNo, int mode)
+        public DataTable GetOrder(string orderDate, int batchNo, int mode, bool isSortAbnormityOrderByOrder)
         {
             using (PersistentManager pm = new PersistentManager())
             {
@@ -110,7 +110,7 @@ namespace THOK.AS.Dal
                         break;
                     case 4://ÒìÐÎ·Ö¼ð´òÂë
                         if (abnormitySortLineCode != string.Empty)
-                            return orderDao.FindOrderForAbnormity(orderDate, batchNo, abnormitySortLineCode);
+                            return orderDao.FindOrderForAbnormity(orderDate, batchNo, abnormitySortLineCode,isSortAbnormityOrderByOrder);
                         else
                             return new DataTable();    
                         break;

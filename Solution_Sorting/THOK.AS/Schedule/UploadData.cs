@@ -17,6 +17,7 @@ namespace THOK.AS.Schedule
         private string txtFile = "";
         private string zipFile = "";
         private bool isAbnormity = false;
+        private bool isSortAbnormityOrderByOrder;
 
         public UploadData()
         {
@@ -43,7 +44,8 @@ namespace THOK.AS.Schedule
             parameter = new Dal.ParameterDal().FindParameter();
             txtFile = "RetailerOrder" + System.DateTime.Now.ToString("yyyyMMddHHmmss");
             zipFile = parameter["NoOneProFilePath"] + txtFile + ".zip";
-            txtFile = txtFile + (IsAbnormity ? ".Order" : ".Order");
+            isSortAbnormityOrderByOrder = Convert.ToBoolean(parameter["IsSortAbnormityOrderByOrder"]);
+            txtFile = txtFile + (IsAbnormity && !isSortAbnormityOrderByOrder ? ".YXOrder" : ".Order");
             this.isAbnormity = IsAbnormity;
             try
             {
@@ -101,12 +103,11 @@ namespace THOK.AS.Schedule
             OrderScheduleDal orderDal = new OrderScheduleDal();
             DataTable table;
             int columnCount;
-            bool isSortAbnormityOrderByOrder = Convert.ToBoolean(parameter["isSortAbnormityOrderByOrder"]);
 
             if (!this.isAbnormity)
             {
                 //正常分拣打码
-                table = orderDal.GetOrder(orderDate, batchNo, 1);
+                table = orderDal.GetOrder(orderDate, batchNo, 1,false);
                 columnCount = table.Columns.Count;
                 foreach (DataRow row in table.Rows)
                 {
@@ -122,7 +123,7 @@ namespace THOK.AS.Schedule
             if (!this.isAbnormity)
             {
                 //手工分拣打码
-                table = orderDal.GetOrder(orderDate, batchNo, 2);
+                table = orderDal.GetOrder(orderDate, batchNo, 2,false);
                 columnCount = table.Columns.Count;
                 foreach (DataRow row in table.Rows)
                 {
@@ -138,7 +139,7 @@ namespace THOK.AS.Schedule
             if (!this.isAbnormity)
             {
                 //整件分拣打码
-                table = orderDal.GetOrder(orderDate, batchNo, 3);
+                table = orderDal.GetOrder(orderDate, batchNo, 3,false);
                 columnCount = table.Columns.Count;
                 foreach (DataRow row in table.Rows)
                 {
@@ -154,7 +155,7 @@ namespace THOK.AS.Schedule
             if (this.isAbnormity)
             {
                 //异形分拣打码
-                table = orderDal.GetOrder(orderDate, batchNo, 4);
+                table = orderDal.GetOrder(orderDate, batchNo, 4,isSortAbnormityOrderByOrder);
                 columnCount = table.Columns.Count;
                 int index_cigarette = 0;
                 string cigaretteCode = "";
