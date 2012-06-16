@@ -29,7 +29,7 @@ namespace THOK.AS.Schedule
             {
                 DirectoryInfo dir = new DirectoryInfo(parameter["NoOneProFilePath"]);
                 if (!dir.Exists)
-                    dir.Create();                
+                    dir.Create();
             }
             catch (Exception e)
             {
@@ -101,6 +101,7 @@ namespace THOK.AS.Schedule
             OrderScheduleDal orderDal = new OrderScheduleDal();
             DataTable table;
             int columnCount;
+            bool isSortAbnormityOrderByOrder = Convert.ToBoolean(parameter["isSortAbnormityOrderByOrder"]);
 
             if (!this.isAbnormity)
             {
@@ -159,17 +160,28 @@ namespace THOK.AS.Schedule
                 string cigaretteCode = "";
                 foreach (DataRow row in table.Rows)
                 {
-                    if (cigaretteCode != row[4].ToString().Trim())
+                    string s = string.Empty;
+                    if (isSortAbnormityOrderByOrder)
                     {
-                        index_cigarette++;
-                        cigaretteCode = row[4].ToString().Trim();
+                        s = row["SORTNO"].ToString();
+                        for (int i = 1; i < columnCount; i++)
+                            s += ("," + row[i].ToString().Trim());
+                        s += ";";
                     }
-                    string s = row["SORTNO"].ToString();
-                    s += ("," + index_cigarette.ToString());
+                    else
+                    {
+                        if (cigaretteCode != row[4].ToString().Trim())
+                        {
+                            index_cigarette++;
+                            cigaretteCode = row[4].ToString().Trim();
+                        }
+                        s = row["SORTNO"].ToString();
+                        s += ("," + index_cigarette.ToString());
+                        for (int i = 2; i < columnCount; i++)
+                            s += ("," + row[i].ToString().Trim());
+                        s += ";";
+                    }
 
-                    for (int i = 2; i < columnCount; i++)
-                        s += ("," + row[i].ToString().Trim());
-                    s += ";";
                     writer.WriteLine(s);
                     writer.Flush();
                 }
@@ -223,7 +235,7 @@ namespace THOK.AS.Schedule
             NetworkStream stream = client.GetStream();
 
             FileStream file = new FileStream(zipFile, FileMode.Open);
-            
+
             int fileLength = (int)file.Length;
             byte[] fileBytes = BitConverter.GetBytes(fileLength);
             Array.Reverse(fileBytes);
@@ -254,7 +266,7 @@ namespace THOK.AS.Schedule
 
                     if (recvStr == "##")
                     {
-                        recvStr = Encoding.GetEncoding("gb2312").GetString(buffer, 4, bytes - 5);                        
+                        recvStr = Encoding.GetEncoding("gb2312").GetString(buffer, 4, bytes - 5);
                         break;
                     }
                 }
@@ -264,7 +276,7 @@ namespace THOK.AS.Schedule
             if (recvStr.Split(';').Length > 2)
             {
                 throw new Exception(recvStr);
-            }        
+            }
         }
 
         /// <summary>
