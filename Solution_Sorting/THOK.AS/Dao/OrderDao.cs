@@ -293,7 +293,7 @@ namespace THOK.AS.Dao
                     " AND A.ORDERID NOT IN (SELECT ORDERID FROM AS_HANDLE_SORT_ORDER WHERE ORDERDATE = '{0}') " +
                     //分组
                     " GROUP BY A.ORDERDATE,  A.BATCHNO, B.LINECODE,A.ORDERID, A.AREACODE,C.SORTID,C.AREANAME, A.ROUTECODE," +
-                        " D.ROUTENAME, A.CUSTOMERCODE, E.CUSTOMERNAME,E.ADDRESS, E.LICENSENO,D.SORTID,A.ROUTECODE, E.SORTID " +
+                        " D.ROUTENAME, A.CUSTOMERCODE, E.CUSTOMERNAME,E.ADDRESS, E.LICENSENO,D.SORTID,A.ROUTECODE, A.SORTID " +
                     //条件
                     " HAVING ISNULL(SUM(K.QUANTITY),0) > 0 " +
                     //排序
