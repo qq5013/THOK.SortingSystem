@@ -80,6 +80,7 @@
                           接口数据库<asp:DropDownList ID="ddlInterface" runat="server" CssClass="TEXTBOX">
                               <asp:ListItem Value="ncyc-db2">OuterConnection</asp:ListItem>
                               <asp:ListItem Value="ayyc-mssql">OldConnection</asp:ListItem>
+                              <asp:ListItem Value="wwyc-db2">LangChaoConnection</asp:ListItem>
                           </asp:DropDownList></td>
                 </tr>
              </table>

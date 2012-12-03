@@ -9,6 +9,7 @@ namespace THOK.AS.Dao
     public class SalesSystemDao : BaseDao
     {
         public string dbTypeName = "zybzjk-mssql";
+        public string comID = "";//公司ID针对甘肃分拣的接口此字段为配送中心代码，按代码来下载数据
         public SalesSystemDao()
         {
             THOK.AS.Dao.SysParameterDao parameterDao = new SysParameterDao();
@@ -17,6 +18,7 @@ namespace THOK.AS.Dao
             //分拣订单业务数据接口服务器数据库类型
             if (parameter["SalesSystemDBType"] != "")
                 dbTypeName = parameter["SalesSystemDBType"];
+            comID = parameter["ComID"];
         }
 
         /// <summary>
@@ -56,6 +58,10 @@ namespace THOK.AS.Dao
                 case "ncyc-db2":
                     sql = @"SELECT AREACODE, AREANAME,0 AS SORTID " +
                             " FROM OUKANG.OUKANG_REGION";
+                    break;
+                case "wwyc-db2":
+                    sql = string.Format("SELECT DISTINCT DIST_STA_CODE AS AREACODE,LTRIM(RTRIM(DIST_STA_NAME)) AS AREANAME, 0 AS SORTID " +
+                           " FROM db2inst1.V_WMS_DIST_STATION WHERE ISACTIVE ='1'AND COM_ID='{0}'", comID);
                     break;
                 default:
                     sql = @"SELECT SALE_REG_CODE AS AREACODE,SALE_REG_NAME AS AREANAME,0 AS SORTID " +
@@ -103,6 +109,10 @@ namespace THOK.AS.Dao
                 case "ncyc-db2":
                     sql = @"SELECT ROUTECODE,ROUTENAME, AREACODE, SORTID " +
                             " FROM OUKANG.OUKANG_RUT";
+                    break;
+                case "wwyc-db2":
+                    sql = string.Format(@"SELECT DISTINCT DELIVER_LINE_CODE AS ROUTECODE,DELIVER_LINE_NAME AS ROUTENAME,DIST_STA_CODE AS AREACODE, DELIVER_LINE_ORDER AS SORTID
+                            FROM db2inst1.V_WMS_DELIVER_LINE WHERE ISACTIVE = '1'AND COM_ID='{0}'", comID);
                     break;
                 default:
                     sql = @"SELECT DELIVER_LINE_CODE AS ROUTECODE, DELIVER_LINE_NAME AS ROUTENAME, '', DELIVER_LINE_ORDER AS SORTID, '' " +
@@ -171,6 +181,14 @@ namespace THOK.AS.Dao
                             " A.ADDRESS,A.LICENSENO AS N_CUST_CODE  FROM OUKANG.OUKANG_CUST A " +
                             " LEFT JOIN OUKANG.OUKANG_RUT B ON A.ROUTECODE = B.ROUTECODE";
                     break;
+                case "wwyc-db2":
+                    sql = string.Format(@"SELECT CUST_CODE AS CUSTOMERCODE,LTRIM(RTRIM(PRINCIPAL_NAME)) AS CUSTOMERNAME," +
+                            " A.DELIVER_LINE_CODE AS ROUTECODE,B.DIST_STA_CODE AS AREACODE,LICENSE_CODE AS LICENSENO," +
+                            " DELIVER_ORDER AS SORTID,DIST_PHONE AS TELNO,DIST_ADDRESS AS ADDRESS,N_CUST_CODE " +
+                            " FROM db2inst1.V_WMS_CUSTOMER A" +
+                            " LEFT JOIN db2inst1.V_WMS_DELIVER_LINE B ON A.DELIVER_LINE_CODE = B.DELIVER_LINE_CODE" +
+                            " WHERE A.ISACTIVE ='1' AND A.COM_ID='{0}' AND B.COM_ID='{0}'", comID);
+                    break;
                 default:
                     sql = @"SELECT CUST_CODE AS CUSTOMERCODE,CUST_NAME AS CUSTOMERNAME,DELIVER_LINE_CODE AS ROUTECODE, " +
                             "SALE_REG_CODE AS AREACODE,LICENSE_CODE AS LICENSENO,DELIVER_ORDER AS SORTID, " +
@@ -229,6 +247,12 @@ namespace THOK.AS.Dao
                 case "ncyc-db2":
                     sql = @"SELECT CIGARETTECODE, CIGARETTENAME,ISABNORMITY,RIGHT(ltrim(rtrim(BARCODE)),6)  BARCODE " +
                             " FROM OUKANG.OUKANG_ITEM";
+                    break;
+                case "wwyc-db2":
+                    sql = string.Format(@"SELECT LTRIM(RTRIM(BRAND_CODE)) AS CIGARETTECODE,LTRIM(RTRIM(BRAND_NAME)) AS  CIGARETTENAME," +
+                            " IS_ABNORMITY_BRAND AS ISABNORMITY," +
+                            "RIGHT(ltrim(rtrim(BARCODE_PIECE)),6) BARCODE " +
+                            " FROM db2inst1.V_WMS_BRAND WHERE ISACTIVE ='1' AND COM_ID='{0}'", comID);
                     break;
                 default:
                     sql = @"SELECT BRAND_CODE AS CIGARETTECODE,BRAND_NAME AS CIGARETTENAME," +
@@ -299,6 +323,12 @@ namespace THOK.AS.Dao
                             LEFT JOIN OUKANG_CUST B ON A.CUSTOMERCODE = B.CUSTOMERCODE 
                              WHERE A.ORDERDATE = '{2}' AND B.ROUTECODE NOT IN ({3}) 
                              GROUP BY ORDERID,A.CUSTOMERCODE, A.RUTCODE ,AREACODE,B.SORTID";
+                    break;
+                case "wwyc-db2":
+                    sql = @"SELECT '{0}', {1}, ORDER_ID AS ORDERID,ORG_CODE AS ORGCODE,DIST_STA_CODE AS AREACODE," +
+                            " DELIVER_LINE_CODE AS ROUTECODE,CUST_CODE AS CUSTOMERCODE,DELIVER_ORDER AS SORTID ,DETAIL_NUM AS DETAILNUM,'0' AS IS_IMPORT " +
+                            " FROM db2inst1.V_WMS_SORT_ORDER" +
+                            " WHERE ORDER_DATE = '{2}' AND DELIVER_LINE_CODE NOT IN ({3}) AND ISACTIVE ='1'AND COM_ID='" + comID + "'";
                     break;
                 default:
                     sql = @"SELECT '{0}',{1}, ORDER_ID AS ORDERID, SALE_REG_CODE AS AREACODE,DELIVER_LINE_CODE AS ROUTECODE, " +
@@ -371,6 +401,14 @@ namespace THOK.AS.Dao
                          LEFT JOIN OUKANG.OUKANG_ITEM B ON A.CIGARETTECODE = B.CIGARETTECODE
                         LEFT JOIN OUKANG_CUST C ON A.CUSTOMERCODE = C.CUSTOMERCODE 
                         WHERE ORDERDATE = '{2}' AND C.ROUTECODE NOT IN ({3})";
+                    break;
+                case "wwyc-db2":
+                    sql = @"SELECT A.ORDER_DETAIL_ID AS ORDERDETAILID,A.ORDER_ID AS ORDERID,LTRIM(RTRIM(A.BRAND_CODE)) AS CIGARETTECODE, 
+                             LTRIM(RTRIM(A.BRAND_NAME)) AS CIGARETTENAME,'条' AS UTINNAME,A.QUANTITY AS QUANTITY,0,0,'{0}',{1}, 
+                             QTY_DEMAND AS QTYDEMAND,PRICE AS PRICE,AMOUNT AS AMOUNT,'0' AS IS_IMPORT,A.QUANTITY AS ORDER_QUANTITY 
+                             FROM db2inst1.V_WMS_SORT_ORDER_DETAIL A 
+                             LEFT JOIN db2inst1.V_WMS_SORT_ORDER B ON A.ORDER_ID = B.ORDER_ID
+                             WHERE B.ORDER_DATE = '{2}' AND B.DELIVER_LINE_CODE NOT IN ({3}) AND A.QUANTITY > 0 AND A.COM_ID='" + comID + "'AND B.COM_ID='" + comID + "'";
                     break;
                 default:
                     sql = @"SELECT ORDER_ID AS ORDERID, BRAND_CODE AS CIGARETTECODE, BRAND_NAME AS CIGARETTENAME,QUANTITY,0,0,'{0}',{1}" +
