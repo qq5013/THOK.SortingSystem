@@ -264,7 +264,7 @@ namespace THOK.AS.Dao
         public DataTable FindOrder(string orderDate, int batchNo)
         {
             string sql = @"SELECT MIN(A.SORTNO) SORTNO,
-	                        A.ORDERID,D.N_CUST_CODE,A.CUSTOMERNAME,B.CIGARETTECODE,B.CIGARETTENAME,
+	                        A.ORDERID,D.N_CUST_CODE,A.CUSTOMERNAME,RIGHT(ltrim(rtrim(B.CIGARETTECODE)),6) as CIGARETTECODE,B.CIGARETTENAME,
 	                        SUM(B.QUANTITY) QUANTITY,   
 	                        ISNULL(Z.BATCHNO_ONEPRO,Z.BATCHNO) BATCHNO,  
 	                        MIN(A.SORTNO) ORDERNO,
@@ -418,7 +418,7 @@ namespace THOK.AS.Dao
             //按订单打
             string sql = "SELECT ROW_NUMBER() OVER (ORDER BY D.SORTID,C.SORTID,A.ORDERID ,B.CIGARETTECODE) AS SORTNO, " +
                             " A.ORDERID,C.N_CUST_CODE,C.CUSTOMERNAME," +
-                            " B.CIGARETTECODE,B.CIGARETTENAME,B.QUANTITY, " +
+                            " RIGHT(ltrim(rtrim(B.CIGARETTECODE)),6) as CIGARETTECODE,B.CIGARETTENAME,B.QUANTITY, " +
                             " ISNULL(Z.BATCHNO_ONEPRO,Z.BATCHNO) BATCHNO," +
                             " ROW_NUMBER() OVER (ORDER BY D.SORTID,C.SORTID,A.ORDERID ,B.CIGARETTECODE) ORDERNO," +
                             " D.ROUTECODE,D.ROUTENAME," +
@@ -441,7 +441,7 @@ namespace THOK.AS.Dao
             //按品牌打
             sql = @"SELECT ROW_NUMBER() OVER (ORDER BY B.CIGARETTECODE,D.SORTID,C.SORTID) AS SORTNO,   
                       A.ORDERID,C.N_CUST_CODE,C.CUSTOMERNAME,  
-                      B.CIGARETTECODE,B.CIGARETTENAME,B.QUANTITY,   
+                      RIGHT(ltrim(rtrim(B.CIGARETTECODE)),6) as CIGARETTECODE,B.CIGARETTENAME,B.QUANTITY,   
                       ISNULL(Z.BATCHNO_ONEPRO,Z.BATCHNO) BATCHNO,  
                       ROW_NUMBER() OVER (ORDER BY D.SORTID,C.SORTID,A.ORDERID ,B.CIGARETTECODE) ORDERNO,  
                       D.ROUTECODE,D.ROUTENAME,  
