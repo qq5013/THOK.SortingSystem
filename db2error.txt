@@ -1,0 +1,13 @@
+------------*分拣管理信息系统数据下载时报SQLSTATE=57014错误的处理办法：*---------
+找到DB2数据库访问驱动的安装目录，X:\Program Files (x86)\IBM\IBM DATA SERVER DRIVER
+找到文件名为db2cli.ini的文件，打开文件，在文件里面添加参数，参数如下：
+[DEVEL]
+DBALIAS=DEVEL
+QUERYTIMEOUTINTERVAL=0
+
+[COMMON] 
+QUERYTIMEOUTINTERVAL=0 
+
+[DORP]
+DBALIAS=DORP
+然后重新下载数据就可以了
